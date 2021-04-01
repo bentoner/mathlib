@@ -6,6 +6,7 @@ Authors: Bhavik Mehta, Scott Morrison
 import category_theory.currying
 import category_theory.limits.over
 import category_theory.monad.adjunction
+import category_theory.limits.constructions.epi_mono
 
 /-!
 # Monomorphisms over a fixed object
@@ -135,6 +136,18 @@ lemma lift_comm (F : over Y ⥤ over X)
   lift F h ⋙ mono_over.forget X = mono_over.forget Y ⋙ F :=
 rfl
 
+@[simp]
+lemma lift_obj_arrow {Y : D} (F : over Y ⥤ over X)
+  (h : ∀ (f : mono_over Y), mono (F.obj ((mono_over.forget Y).obj f)).hom) (f : mono_over Y) :
+  ((lift F h).obj f).arrow = (F.obj ((forget Y).obj f)).hom :=
+rfl
+
+@[simp]
+def lift_post (F : C ⥤ D) (h : ∀ f : mono_over X, mono (F.map ((forget X).obj f).hom)) :
+  mono_over X ⥤ mono_over (F.obj X) :=
+lift (over.post F) h
+
+
 /--
 Monomorphisms over an object `f : over A` in an over category
 are equivalent to monomorphisms over the source of `f`.
@@ -224,11 +237,26 @@ instance faithful_map (f : X ⟶ Y) [mono f] : faithful (map f) := {}.
 /--
 Isomorphic objects have equivalent `mono_over` categories.
 -/
+@[simps]
 def map_iso {A B : C} (e : A ≅ B) : mono_over A ≌ mono_over B :=
 { functor := map e.hom,
   inverse := map e.inv,
   unit_iso := ((map_comp _ _).symm ≪≫ eq_to_iso (by simp) ≪≫ map_id).symm,
   counit_iso := ((map_comp _ _).symm ≪≫ eq_to_iso (by simp) ≪≫ map_id) }
+
+def congr (F : C ≌ D) : mono_over X ≌ mono_over (F.functor.obj X) :=
+{ functor := lift_post F.functor $ λ f,
+  begin
+    apply right_adjoint_preserves_mono F.symm.to_adjunction,
+    exact f.property,
+  end,
+  inverse := (lift_post F.inverse $ λ f,
+  begin
+    apply right_adjoint_preserves_mono F.to_adjunction,
+    exact f.property,
+  end) ⋙ (map_iso (F.unit_iso.symm.app X)).functor,
+  unit_iso := nat_iso.of_components (λ Y, iso_mk (F.unit_iso.app Y) (by tidy)) (by tidy),
+  counit_iso := nat_iso.of_components (λ Y, iso_mk (F.counit_iso.app Y) (by tidy)) (by tidy) }
 
 section
 variable [has_pullbacks C]
