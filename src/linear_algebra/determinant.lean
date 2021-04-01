@@ -46,6 +46,7 @@ variables {R : Type v} [comm_ring R]
 
 local notation `ε` σ:max := ((sign σ : ℤ ) : R)
 
+local attribute [instance] add_comm_group.int_module
 
 /-- `det` is an `alternating_map` in the rows of the matrix. -/
 def det_row_multilinear : alternating_map R (n → R) R n :=

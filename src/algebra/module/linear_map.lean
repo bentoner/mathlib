@@ -260,6 +260,15 @@ instance compatible_smul.int_module
   case hn : n ih { simpa [sub_smul] using ih }
 end⟩
 
+instance compatible_smul.nat_module
+  {S : Type*} [semiring S] [semimodule ℕ M]
+  [semimodule S M] [semimodule ℕ M₂] [semimodule S M₂] : compatible_smul M M₂ ℕ S :=
+⟨λ f c x, begin
+  induction c with c ih,
+  { simp },
+  { simpa [nat.succ_eq_add_one, add_smul] using ih },
+end⟩
+
 end add_comm_group
 
 end linear_map

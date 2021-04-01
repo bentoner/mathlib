@@ -904,6 +904,11 @@ instance compatible_smul.int [semimodule ℤ M] [semimodule ℤ N] : compatible_
   (λ r ih, by simpa [add_smul, tmul_add, add_tmul] using ih)
   (λ r ih, by simpa [sub_smul, tmul_sub, sub_tmul] using ih)⟩
 
+instance compatible_smul.nat [semimodule ℕ M] [semimodule ℕ N] : compatible_smul R ℕ M N :=
+⟨λ r m n, nat.rec_on r
+  (by simp)
+  (λ r ih, by simpa [nat.succ_eq_add_one, add_smul, tmul_add, add_tmul] using ih)⟩
+
 end tensor_product
 
 namespace linear_map

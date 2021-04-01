@@ -352,6 +352,7 @@ open mv_polynomial
 lemma sum_smul [semimodule ℕ R] (n : ℕ) :
   (finset.range (n + 1)).sum (λ ν, ν • bernstein_polynomial R n ν) = n • X :=
 begin
+  letI : algebra ℕ R := algebra_nat_of_semimodule R,
   -- We calculate the `x`-derivative of `(x+y)^n`, evaluated at `y=(1-x)`,
   -- either directly or by using the binomial theorem.
 
@@ -395,14 +396,14 @@ begin
     to_rhs,
     rw [pderiv_pow, (pderiv tt).map_add, pderiv_tt_x, pderiv_tt_y],
     simp [e, nat_cast_mul], },
-  convert h,
-  sorry
+  exact h,
 end
 
 lemma sum_mul_smul [semimodule ℕ R] (n : ℕ) :
   (finset.range (n + 1)).sum (λ ν, (ν * (ν-1)) • bernstein_polynomial R n ν) =
     (n * (n-1)) • X^2 :=
 begin
+  letI : algebra ℕ R := algebra_nat_of_semimodule R,
   -- We calculate the second `x`-derivative of `(x+y)^n`, evaluated at `y=(1-x)`,
   -- either directly or by using the binomial theorem.
 
@@ -454,8 +455,7 @@ begin
       pderiv_tt_x, pderiv_tt_y],
     simp [e, nat_cast_mul, smul_smul],
   },
-  convert h,
-  sorry
+  exact h
 end
 
 end bernstein_polynomial

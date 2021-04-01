@@ -803,7 +803,7 @@ end comm_ring
 
 /-- Möbius inversion for functions to an `add_comm_group`. -/
 theorem sum_eq_iff_sum_smul_moebius_eq
-  [add_comm_group R] {f g : ℕ → R} :
+  [add_comm_group R] [semimodule ℤ R] {f g : ℕ → R} :
   (∀ (n : ℕ), 0 < n → ∑ i in (n.divisors), f i = g n) ↔
     ∀ (n : ℕ), 0 < n → ∑ (x : ℕ × ℕ) in n.divisors_antidiagonal, μ x.fst • g x.snd = f n :=
 begin
@@ -837,6 +837,7 @@ theorem sum_eq_iff_sum_mul_moebius_eq [comm_ring R] {f g : ℕ → R} :
   (∀ (n : ℕ), 0 < n → ∑ i in (n.divisors), f i = g n) ↔
     ∀ (n : ℕ), 0 < n → ∑ (x : ℕ × ℕ) in n.divisors_antidiagonal, (μ x.fst : R) * g x.snd = f n :=
 begin
+  letI : semimodule ℤ R := add_comm_group.int_module,
   rw sum_eq_iff_sum_smul_moebius_eq,
   apply forall_congr,
   intro a,
@@ -848,7 +849,10 @@ end
 theorem prod_eq_iff_prod_pow_moebius_eq [comm_group R] {f g : ℕ → R} :
   (∀ (n : ℕ), 0 < n → ∏ i in (n.divisors), f i = g n) ↔
     ∀ (n : ℕ), 0 < n → ∏ (x : ℕ × ℕ) in n.divisors_antidiagonal, g x.snd ^ (μ x.fst) = f n :=
-@sum_eq_iff_sum_smul_moebius_eq (additive R) _ _ _
+begin
+  letI : semimodule ℤ (additive R) := add_comm_group.int_module,
+  exact @sum_eq_iff_sum_smul_moebius_eq (additive R) _ _ f g
+end
 
 /-- Möbius inversion for functions to a `comm_group_with_zero`. -/
 theorem prod_eq_iff_prod_pow_moebius_eq_of_nonzero [comm_group_with_zero R] {f g : ℕ → R}

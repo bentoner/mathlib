@@ -393,6 +393,8 @@ noncomputable def add_val (R : Type u) [integral_domain R] [discrete_valuation_r
   add_valuation R enat :=
 add_valuation (classical.some_spec (exists_prime R))
 
+instance : semimodule ℕ enat := add_comm_monoid.nat_semimodule
+
 lemma add_val_def (r : R) (u : units R) {ϖ : R} (hϖ : irreducible ϖ) (n : ℕ) (hr : r = u * ϖ ^ n) :
   add_val R r = n :=
 by rw [add_val, add_valuation_apply, hr,

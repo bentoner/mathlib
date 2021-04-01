@@ -724,15 +724,11 @@ lemma multilinear_map.dom_coprod_alternization_eq [semimodule ℕ N₁] [semimod
     .alternatization =
     ((fintype.card ιa).factorial * (fintype.card ιb).factorial) • a.dom_coprod b :=
 begin
-  sorry
-  /-
-  rw [multilinear_map.dom_coprod_alternization, coe_alternatization, coe_alternatization, mul_smul],
-  rw [←dom_coprod'_apply, ←dom_coprod'_apply],
-  rw [←tensor_product.smul_tmul', tensor_product.tmul_smul],
-   rw [linear_map.map_smul_of_tower dom_coprod', linear_map.map_smul_of_tower dom_coprod'],
+  rw [multilinear_map.dom_coprod_alternization, coe_alternatization, coe_alternatization, mul_smul,
+    ←dom_coprod'_apply, ←dom_coprod'_apply, ←tensor_product.smul_tmul', tensor_product.tmul_smul,
+    linear_map.map_smul_of_tower dom_coprod', linear_map.map_smul_of_tower dom_coprod'],
   -- typeclass resolution is a little confused here
   apply_instance, apply_instance,
-  -/
 end
 
 end coprod
