@@ -582,11 +582,14 @@ end subalgebra
 
 section nat
 
-variables {R : Type*} [semiring R]
+variables {R : Type*} [semiring R] [algebra ℕ R]
 
 /-- A subsemiring is a `ℕ`-subalgebra. -/
 def subalgebra_of_subsemiring (S : subsemiring R) : subalgebra ℕ R :=
-{ algebra_map_mem' := λ i, S.coe_nat_mem i,
+{ algebra_map_mem' := λ i, begin
+    simp only [ring_hom.eq_nat_cast, subsemiring.mem_carrier],
+    exact S.coe_nat_mem i
+  end,
   .. S }
 
 @[simp] lemma mem_subalgebra_of_subsemiring {x : R} {S : subsemiring R} :
@@ -597,14 +600,17 @@ end nat
 
 section int
 
-variables {R : Type*} [ring R]
+variables {R : Type*} [ring R] [algebra ℤ R]
 
 /-- A subring is a `ℤ`-subalgebra. -/
 def subalgebra_of_subring (S : subring R) : subalgebra ℤ R :=
-{ algebra_map_mem' := λ i, int.induction_on i S.zero_mem
-  (λ i ih, S.add_mem ih S.one_mem)
-  (λ i ih, show ((-i - 1 : ℤ) : R) ∈ S, by { rw [int.cast_sub, int.cast_one],
-    exact S.sub_mem ih S.one_mem }),
+{ algebra_map_mem' := λ i, begin
+    simp only [ring_hom.eq_int_cast, subring.mem_carrier],
+    exact int.induction_on i S.zero_mem
+      (λ i ih, S.add_mem ih S.one_mem)
+      (λ i ih, show ((-i - 1 : ℤ) : R) ∈ S, by { rw [int.cast_sub, int.cast_one],
+         exact S.sub_mem ih S.one_mem })
+  end,
   .. S }
 
 /-- A subset closed under the ring operations is a `ℤ`-subalgebra. -/

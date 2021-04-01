@@ -324,8 +324,8 @@ abbreviation module.End (R : Type u) (M : Type v)
   [semiring R] [add_comm_monoid M] [semimodule R M] := M →ₗ[R] M
 
 /-- Reinterpret an additive homomorphism as a `ℤ`-linear map. -/
-def add_monoid_hom.to_int_linear_map [add_comm_group M] [add_comm_group M₂] (f : M →+ M₂) :
-  M →ₗ[ℤ] M₂ :=
+def add_monoid_hom.to_int_linear_map [add_comm_group M] [add_comm_group M₂]
+  [semimodule ℤ M] [semimodule ℤ M₂] (f : M →+ M₂) : M →ₗ[ℤ] M₂ :=
 ⟨f, f.map_add, f.map_int_module_smul⟩
 
 /-- Reinterpret an additive homomorphism as a `ℚ`-linear map. -/

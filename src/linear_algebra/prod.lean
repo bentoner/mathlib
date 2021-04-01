@@ -157,9 +157,13 @@ See note [bundled maps over different rings] for why separate `R` and `S` semiri
   map_smul' := λ r a,
     by { ext, simp only [smul_add, smul_apply, prod.smul_snd, prod.smul_fst, coprod_apply] } }
 
+section
+local attribute [instance] add_comm_monoid.nat_semimodule
+
 theorem prod_ext_iff {f g : M × M₂ →ₗ[R] M₃} :
   f = g ↔ f.comp (inl _ _ _) = g.comp (inl _ _ _) ∧ f.comp (inr _ _ _) = g.comp (inr _ _ _) :=
 (coprod_equiv ℕ).symm.injective.eq_iff.symm.trans prod.ext_iff
+end
 
 /--
 Split equality of linear maps from a product into linear maps over each component, to allow `ext`

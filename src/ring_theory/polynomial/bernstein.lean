@@ -199,7 +199,10 @@ end
 lemma iterate_derivative_at_0_aux₂ (n k : ℕ) :
   (↑k) * polynomial.eval ↑(k-n) (pochhammer R n) =
     ↑(k-n) * polynomial.eval (↑(k-n+1)) (pochhammer R n) :=
-by simpa using congr_arg (algebra_map ℕ R) (iterate_derivative_at_0_aux₁ n k)
+begin
+  letI : algebra ℕ R := algebra_nat R,
+  simpa using congr_arg (algebra_map ℕ R) (iterate_derivative_at_0_aux₁ n k)
+end
 
 @[simp]
 lemma iterate_derivative_at_0 (n ν : ℕ) :
@@ -346,7 +349,7 @@ end
 open polynomial
 open mv_polynomial
 
-lemma sum_smul (n : ℕ) :
+lemma sum_smul [semimodule ℕ R] (n : ℕ) :
   (finset.range (n + 1)).sum (λ ν, ν • bernstein_polynomial R n ν) = n • X :=
 begin
   -- We calculate the `x`-derivative of `(x+y)^n`, evaluated at `y=(1-x)`,
@@ -392,10 +395,11 @@ begin
     to_rhs,
     rw [pderiv_pow, (pderiv tt).map_add, pderiv_tt_x, pderiv_tt_y],
     simp [e, nat_cast_mul], },
-  exact h,
+  convert h,
+  sorry
 end
 
-lemma sum_mul_smul (n : ℕ) :
+lemma sum_mul_smul [semimodule ℕ R] (n : ℕ) :
   (finset.range (n + 1)).sum (λ ν, (ν * (ν-1)) • bernstein_polynomial R n ν) =
     (n * (n-1)) • X^2 :=
 begin
@@ -450,7 +454,8 @@ begin
       pderiv_tt_x, pderiv_tt_y],
     simp [e, nat_cast_mul, smul_smul],
   },
-  exact h,
+  convert h,
+  sorry
 end
 
 end bernstein_polynomial

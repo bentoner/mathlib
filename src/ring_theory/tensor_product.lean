@@ -284,9 +284,13 @@ instance : comm_ring (A ⊗[R] B) :=
 
 end comm_ring
 
+section
+local attribute [instance] algebra_int
+
 /--
 Verify that typeclass search finds the ring structure on `A ⊗[ℤ] B`
 when `A` and `B` are merely rings, by treating both as `ℤ`-algebras.
+For this, the instance attribute needs to be registered on `algebra_int`
 -/
 example {A : Type v₁} [ring A] {B : Type v₂} [ring B] : ring (A ⊗[ℤ] B) :=
 by apply_instance
@@ -294,9 +298,12 @@ by apply_instance
 /--
 Verify that typeclass search finds the comm_ring structure on `A ⊗[ℤ] B`
 when `A` and `B` are merely comm_rings, by treating both as `ℤ`-algebras.
+For this, the instance attribute needs to be registered on `algebra_int`
 -/
 example {A : Type v₁} [comm_ring A] {B : Type v₂} [comm_ring B] : comm_ring (A ⊗[ℤ] B) :=
 by apply_instance
+
+end
 
 /-!
 We now build the structure maps for the symmetric monoidal category of `R`-algebras.

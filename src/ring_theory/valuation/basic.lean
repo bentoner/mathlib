@@ -476,7 +476,8 @@ lemma map_lt_sum {ι : Type*} {s : finset ι} {f : ι → R} {g : Γ₀} (hg : g
 lemma map_lt_sum' {ι : Type*} {s : finset ι} {f : ι → R} {g : Γ₀} (hg : g < ⊤)
   (hf : ∀ i ∈ s, g < v (f i)) : g < v (∑ i in s, f i) := v.map_sum_lt' hg hf
 
-@[simp] lemma map_pow  : ∀ x (n:ℕ), v (x^n) = n • (v x) := v.map_pow
+@[simp] lemma map_pow [semimodule ℕ Γ₀] (x : R) (n : ℕ) : v (x^n) = n • (v x) :=
+by { rw ← nsmul_eq_smul, exact v.map_pow x n }
 
 @[ext] lemma ext {v₁ v₂ : add_valuation R Γ₀} (h : ∀ r, v₁ r = v₂ r) : v₁ = v₂ :=
 valuation.ext h

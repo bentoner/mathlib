@@ -1230,7 +1230,8 @@ def quotient.mkₐ (I : ideal A) : A →ₐ[R] I.quotient :=
 
 lemma quotient.alg_map_eq (I : ideal A) :
   algebra_map R I.quotient = (algebra_map A I.quotient).comp (algebra_map R A) :=
-by simp only [ring_hom.algebra_map_to_algebra, ring_hom.comp_id]
+by simp only [ring_hom.algebra_map_to_algebra, ring_hom.comp_id, ring_hom.to_fun_eq_coe,
+    ring_hom.mk_coe]
 
 instance [algebra S A] [algebra S R] [is_scalar_tower S R A]
   {I : ideal A} : is_scalar_tower S R (ideal.quotient I) :=

@@ -462,6 +462,8 @@ instance pempty_unique : unique (free_abelian_group pempty) :=
     (λ x, pempty.elim x)
     (by { rintros - - rfl rfl, simp })  }
 
+local attribute [instance] add_comm_group.int_module
+
 /-- The free abelian group on a type with one term is isomorphic to `ℤ`. -/
 def punit_equiv (T : Type*) [unique T] : free_abelian_group T ≃+ ℤ :=
 { to_fun := free_abelian_group.lift (λ _, (1 : ℤ)),

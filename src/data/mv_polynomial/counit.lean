@@ -53,7 +53,7 @@ lemma acounit_surjective : surjective (acounit A B) := λ b, ⟨X b, acounit_X A
 
 See `mv_polynomial.acounit` for a “relative” variant for algebras over a base ring,
 and `mv_polynomial.counit_nat` for the “absolute” variant with `R = ℕ`. -/
-noncomputable def counit : mv_polynomial R ℤ →+* R :=
+noncomputable def counit [algebra ℤ R] : mv_polynomial R ℤ →+* R :=
 acounit ℤ R
 
 /-- `mv_polynomial.counit_nat A` is the natural surjective ring homomorphism
@@ -61,19 +61,21 @@ acounit ℤ R
 
 See `mv_polynomial.acounit` for a “relative” variant for algebras over a base ring
 and `mv_polynomial.counit` for the “absolute” variant with `A = ℤ`. -/
-noncomputable def counit_nat : mv_polynomial A ℕ →+* A :=
+noncomputable def counit_nat [algebra ℕ A] : mv_polynomial A ℕ →+* A :=
 acounit ℕ A
 
+lemma counit_surjective [algebra ℤ R] : surjective (counit R) := acounit_surjective ℤ R
+lemma counit_nat_surjective [algebra ℕ A] : surjective (counit_nat A) := acounit_surjective ℕ A
 
-lemma counit_surjective : surjective (counit R) := acounit_surjective ℤ R
-lemma counit_nat_surjective : surjective (counit_nat A) := acounit_surjective ℕ A
+lemma counit_C [algebra ℤ R] (n : ℤ) : counit R (C n) = n :=
+by { convert acounit_C _ _, rw [ring_hom.eq_int_cast] }
 
-lemma counit_C (n : ℤ) : counit R (C n) = n := acounit_C _ _
-lemma counit_nat_C (n : ℕ) : counit_nat A (C n) = n := acounit_C _ _
+lemma counit_nat_C [algebra ℕ A] (n : ℕ) : counit_nat A (C n) = n :=
+by { convert acounit_C _ _, { rw [ring_hom.eq_nat_cast] }, { apply_instance } }
 
 variables {R A}
 
-@[simp] lemma counit_X (r : R) : counit R (X r) = r := acounit_X _ _
-@[simp] lemma counit_nat_X (a : A) : counit_nat A (X a) = a := acounit_X _ _
+@[simp] lemma counit_X [algebra ℤ R] (r : R) : counit R (X r) = r := acounit_X _ _
+@[simp] lemma counit_nat_X [algebra ℕ A] (a : A) : counit_nat A (X a) = a := acounit_X _ _
 
 end mv_polynomial

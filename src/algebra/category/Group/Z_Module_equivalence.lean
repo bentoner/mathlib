@@ -21,6 +21,8 @@ universes u
 
 namespace Module
 
+local attribute [instance] add_comm_group.int_module
+
 /-- The forgetful functor from `ℤ` modules to `AddCommGroup` is full. -/
 instance forget₂_AddCommGroup_full : full (forget₂ (Module ℤ) AddCommGroup.{u}) :=
 { preimage := λ A B f,

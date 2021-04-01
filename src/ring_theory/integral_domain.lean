@@ -106,6 +106,7 @@ local attribute [instance] subtype.group subtype.monoid range.is_submonoid
 lemma sum_hom_units_eq_zero (f : G →* R) (hf : f ≠ 1) : ∑ g : G, f g = 0 :=
 begin
   classical,
+  letI : semimodule ℕ R := add_comm_monoid.nat_semimodule,
   obtain ⟨x, hx⟩ : ∃ x : set.range f.to_hom_units, ∀ y : set.range f.to_hom_units, y ∈ powers x,
     from is_cyclic.exists_monoid_generator,
   have hx1 : x ≠ 1,

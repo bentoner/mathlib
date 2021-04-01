@@ -119,11 +119,17 @@ by { rw [←sub_eq_zero, sub_neg_eq_add, ←add_lie], simp, }
 @[simp] lemma lie_neg : ⁅x, -m⁆ = -⁅x, m⁆ :=
 by { rw [←sub_eq_zero, sub_neg_eq_add, ←lie_add], simp, }
 
-@[simp] lemma gsmul_lie (a : ℤ) : ⁅a • x, m⁆ = a • ⁅x, m⁆ :=
-add_monoid_hom.map_gsmul ⟨λ (x : L), ⁅x, m⁆, zero_lie m, λ _ _, add_lie _ _ _⟩ _ _
+@[simp] lemma gsmul_lie [semimodule ℤ M] [semimodule ℤ L] (a : ℤ) : ⁅a • x, m⁆ = a • ⁅x, m⁆ :=
+begin
+  convert add_monoid_hom.map_gsmul ⟨λ (x : L), ⁅x, m⁆, zero_lie m, λ _ _, add_lie _ _ _⟩ x a;
+  exact (gsmul_eq_smul _ _).symm,
+end
 
-@[simp] lemma lie_gsmul (a : ℤ) : ⁅x, a • m⁆ = a • ⁅x, m⁆ :=
-add_monoid_hom.map_gsmul ⟨λ (m : M), ⁅x, m⁆, lie_zero x, λ _ _, lie_add _ _ _⟩ _ _
+@[simp] lemma lie_gsmul [semimodule ℤ M] [semimodule ℤ L] (a : ℤ) : ⁅x, a • m⁆ = a • ⁅x, m⁆ :=
+begin
+  convert add_monoid_hom.map_gsmul ⟨λ (m : M), ⁅x, m⁆, lie_zero x, λ _ _, lie_add _ _ _⟩ m a;
+  exact (gsmul_eq_smul _ _).symm,
+end
 
 @[simp] lemma lie_lie : ⁅⁅x, y⁆, m⁆ = ⁅x, ⁅y, m⁆⁆ - ⁅y, ⁅x, m⁆⁆ :=
 by rw [leibniz_lie, add_sub_cancel]

@@ -77,9 +77,14 @@ variables {N : Type u₁} [add_comm_monoid N] [semimodule R N]
 variables (φ : Π i, M i →ₗ[R] N)
 
 variables (R ι N φ)
+
+section
+local attribute [instance] add_comm_monoid.nat_semimodule
+
 /-- The linear map constructed using the universal property of the coproduct. -/
 def to_module : (⨁ i, M i) →ₗ[R] N :=
 dfinsupp.lsum ℕ φ
+end
 
 variables {ι N φ}
 

@@ -59,6 +59,7 @@ end
 @[simp, norm_cast] lemma pochhammer_eval_cast (n k : ℕ) :
   ((pochhammer ℕ n).eval k : S) = (pochhammer S n).eval k :=
 begin
+  letI : algebra ℕ S := algebra_nat S,
   rw [←pochhammer_map (algebra_map ℕ S), eval_map, ←(algebra_map ℕ S).eq_nat_cast,
     eval₂_at_nat_cast, nat.cast_id, ring_hom.eq_nat_cast],
 end
@@ -78,6 +79,7 @@ by simp [pochhammer_eval_zero, h]
 
 lemma pochhammer_succ_right (n : ℕ) : pochhammer S (n+1) = pochhammer S n * (X + n) :=
 begin
+  letI : algebra ℕ S := algebra_nat S,
   suffices h : pochhammer ℕ (n+1) = pochhammer ℕ n * (X + n),
   { apply_fun polynomial.map (algebra_map ℕ S) at h,
     simpa only [pochhammer_map, map_mul, map_add, map_X, map_nat_cast] using h, },
@@ -134,7 +136,10 @@ end
 @[simp]
 lemma pochhammer_eval_one (S : Type*) [semiring S] (n : ℕ) :
   (pochhammer S n).eval (1 : S) = (n! : S) :=
-by simpa using congr_arg (algebra_map ℕ S) (pochhammer_eval_one' n)
+begin
+  letI : algebra ℕ S := algebra_nat S,
+  simpa using congr_arg (algebra_map ℕ S) (pochhammer_eval_one' n)
+end
 
 /-- Preliminary version of `factorial_mul_pochhammer` specialized to `S = ℕ`. -/
 lemma factorial_mul_pochhammer' (r n : ℕ) :
@@ -143,7 +148,10 @@ by simpa [add_comm 1 r, pochhammer_eval_one'] using congr_arg (eval 1) (pochhamm
 
 lemma factorial_mul_pochhammer (S : Type*) [semiring S] (r n : ℕ) :
   (r! : S) * (pochhammer S n).eval (r+1) = (r + n)! :=
-by simpa using congr_arg (algebra_map ℕ S) (factorial_mul_pochhammer' r n)
+begin
+  letI : algebra ℕ S := algebra_nat S,
+  simpa using congr_arg (algebra_map ℕ S) (factorial_mul_pochhammer' r n)
+end
 
 lemma pochhammer_eval_eq_factorial_div_factorial {r n : ℕ} :
   (pochhammer ℕ n).eval (r+1) = (r + n)! / r! :=

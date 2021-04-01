@@ -210,7 +210,10 @@ protected def linear_map : R →ₗ[R] A :=
 @[simp]
 lemma linear_map_apply (r : R) : algebra.linear_map R A r = algebra_map R A r := rfl
 
-instance id : algebra R R := (ring_hom.id R).to_algebra
+instance id : algebra R R :=
+{ smul_def' := λ x y, rfl,
+  commutes' := λ x y, mul_comm _ _,
+  .. (ring_hom.id R) }
 
 variables {R A}
 
@@ -1246,20 +1249,31 @@ section nat
 
 variables (R : Type*) [semiring R]
 
-/-- Semiring ⥤ ℕ-Alg -/
-instance algebra_nat : algebra ℕ R :=
+/-- `Semiring ⥤ ℕ-Alg`, based on a generic `ℕ`-semimodule instance on `R` -/
+def algebra_nat_of_semimodule [semimodule ℕ R] : algebra ℕ R :=
 { commutes' := nat.cast_commute,
-  smul_def' := λ _ _, nsmul_eq_mul _ _,
+  smul_def' := λ r x, (nsmul_eq_smul r x) ▸ nsmul_eq_mul r x,
   to_ring_hom := nat.cast_ring_hom R }
+
+section
+local attribute [instance] add_comm_monoid.nat_semimodule
+
+/-- `Semiring ⥤ ℕ-Alg`, based on the specific `ℕ`-semimodule instance on `R` given by
+`add_comm_monoid.nat_semimodule` -/
+def algebra_nat : algebra ℕ R := algebra_nat_of_semimodule R
+end
 
 section span_nat
 open submodule
+
+variable [semimodule ℕ R]
 
 lemma span_nat_eq_add_group_closure (s : set R) :
   (span ℕ s).to_add_submonoid = add_submonoid.closure s :=
 eq.symm $ add_submonoid.closure_eq_of_le subset_span $ λ x hx, span_induction hx
   (λ x hx, add_submonoid.subset_closure hx) (add_submonoid.zero_mem _)
-  (λ _ _, add_submonoid.add_mem _) (λ _ _ _, add_submonoid.nsmul_mem _ ‹_› _)
+  (λ _ _, add_submonoid.add_mem _)
+  (λ a x hx, (nsmul_eq_smul a x) ▸ add_submonoid.nsmul_mem _ hx a)
 
 @[simp] lemma span_nat_eq (s : add_submonoid R) : (span ℕ (s : set R)).to_add_submonoid = s :=
 by rw [span_nat_eq_add_group_closure, s.closure_eq]
@@ -1272,11 +1286,19 @@ section int
 
 variables (R : Type*) [ring R]
 
-/-- Ring ⥤ ℤ-Alg -/
-instance algebra_int : algebra ℤ R :=
+/-- `Ring ⥤ ℤ-Alg`, based on a generic `ℤ`-module instance on `R` -/
+def algebra_int_of_module [module ℤ R] : algebra ℤ R :=
 { commutes' := int.cast_commute,
-  smul_def' := λ _ _, gsmul_eq_mul _ _,
+  smul_def' := λ r x, (gsmul_eq_smul r x) ▸ gsmul_eq_mul x r,
   to_ring_hom := int.cast_ring_hom R }
+
+section
+local attribute [instance] add_comm_group.int_module
+
+/-- `Ring ⥤ ℤ-Alg`, based on the specific `ℤ`-module instance on `R` given by
+`add_comm_monoid.nat_semimodule` -/
+def algebra_int : algebra ℤ R := algebra_int_of_module R
+end
 
 variables {R}
 
@@ -1296,12 +1318,14 @@ end
 
 section span_int
 open submodule
+variable [module ℤ R]
 
 lemma span_int_eq_add_group_closure (s : set R) :
   (span ℤ s).to_add_subgroup = add_subgroup.closure s :=
 eq.symm $ add_subgroup.closure_eq_of_le _ subset_span $ λ x hx, span_induction hx
   (λ x hx, add_subgroup.subset_closure hx) (add_subgroup.zero_mem _)
-  (λ _ _, add_subgroup.add_mem _) (λ _ _ _, add_subgroup.gsmul_mem _ ‹_› _)
+  (λ _ _, add_subgroup.add_mem _)
+  (λ a x hx, (gsmul_eq_smul a x) ▸ add_subgroup.gsmul_mem _ hx a)
 
 @[simp] lemma span_int_eq (s : add_subgroup R) : (span ℤ (s : set R)).to_add_subgroup = s :=
 by rw [span_int_eq_add_group_closure, s.closure_eq]

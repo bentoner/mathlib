@@ -332,7 +332,8 @@ A slight rearrangement from `lsum` gives us
 the bijection underlying the free-forgetful adjunction for R-modules.
 -/
 noncomputable def lift : (X → M) ≃+ ((X →₀ R) →ₗ[R] M) :=
-(add_equiv.arrow_congr (equiv.refl X) (ring_lmap_equiv_self R M ℕ).to_add_equiv.symm).trans
+by letI : semimodule ℕ M := add_comm_monoid.nat_semimodule;
+exact (add_equiv.arrow_congr (equiv.refl X) (ring_lmap_equiv_self R M ℕ).to_add_equiv.symm).trans
   (lsum _ : _ ≃ₗ[ℕ] _).to_add_equiv
 
 @[simp]
@@ -410,9 +411,14 @@ variables (α) {α' : Type*} (M) {M' : Type*} (R)
           [add_comm_monoid M'] [semimodule R M']
           (v : α → M) {v' : α' → M'}
 
+section
+local attribute [instance] add_comm_monoid.nat_semimodule
+
 /-- Interprets (l : α →₀ R) as linear combination of the elements in the family (v : α → M) and
     evaluates this linear combination. -/
 protected def total : (α →₀ R) →ₗ[R] M := finsupp.lsum ℕ (λ i, linear_map.id.smul_right (v i))
+
+end
 
 variables {α M v}
 

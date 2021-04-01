@@ -79,16 +79,16 @@ begin
 end
 
 @[simp]
-lemma ring_hom_eval₂_algebra_map_int {R S : Type*} [ring R] [ring S]
+lemma ring_hom_eval₂_algebra_map_int {R S : Type*} [ring R] [ring S] [algebra ℤ R] [algebra ℤ S]
   (p : polynomial ℤ) (f : R →+* S) (r : R) :
   f (eval₂ (algebra_map ℤ R) r p) = eval₂ (algebra_map ℤ S) (f r) p :=
 alg_hom_eval₂_algebra_map p f.to_int_alg_hom r
 
 @[simp]
-lemma eval₂_algebra_map_int_X {R : Type*} [ring R] (p : polynomial ℤ) (f : polynomial ℤ →+* R) :
+lemma eval₂_algebra_map_int_X {R : Type*} [ring R] [algebra ℤ R]
+  (p : polynomial ℤ) (f : polynomial ℤ →+* R) :
   eval₂ (algebra_map ℤ R) (f X) p = f p :=
--- Unfortunately `f.to_int_alg_hom` doesn't work here, as typeclasses don't match up correctly.
-eval₂_algebra_map_X p { commutes' := λ n, by simp, .. f }
+eval₂_algebra_map_X p f.to_int_alg_hom
 
 end comm_semiring
 

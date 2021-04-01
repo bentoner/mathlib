@@ -577,4 +577,5 @@ end no_zero_smul_divisors
 
 -- We finally turn on these instances globally. By doing this here, we ensure that none of the
 -- lemmas about nat semimodules above are specific to these instances.
-attribute [instance] add_comm_monoid.nat_semimodule add_comm_group.int_module
+
+-- attribute [instance] add_comm_monoid.nat_semimodule add_comm_group.int_module

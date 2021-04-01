@@ -80,7 +80,8 @@ denominators, yields a number greater than or equal to one.  The target can be a
 `linear_ordered_field K`.
 The assumption on `K` could be weakened to `linear_ordered_comm_ring` assuming that the
 image of the denominator is invertible in `K`. -/
-lemma one_le_pow_mul_abs_eval_div {K : Type*} [linear_ordered_field K] {f : polynomial ℤ}
+lemma one_le_pow_mul_abs_eval_div {K : Type*} [linear_ordered_field K] [algebra ℤ K]
+  {f : polynomial ℤ}
   {a b : ℤ} (b0 : 0 < b) (fab : eval ((a : K) / b) (f.map (algebra_map ℤ K)) ≠ 0) :
   (1 : K) ≤ b ^ f.nat_degree * abs (eval ((a : K) / b) (f.map (algebra_map ℤ K))) :=
 begin
@@ -92,7 +93,7 @@ begin
   rw [div_eq_mul_inv, ← Fa, ← int.cast_abs, ← int.cast_one, int.cast_le],
   refine int.le_of_lt_add_one ((lt_add_iff_pos_left 1).mpr (abs_pos.mpr (λ F0, fab _))),
   rw [eq_one_div_of_mul_eq_one_left bu, F0, one_div, eq_int_cast, int.cast_zero, zero_eq_mul] at hF,
-  cases hF with hF hF,
-  { exact (not_le.mpr b0 (le_of_eq (int.cast_eq_zero.mp (pow_eq_zero hF)))).elim },
-  { rwa div_eq_mul_inv }
+  cases hF with hF hF; simp only [(algebra_map ℤ K).eq_int_cast] at hF,
+  { exact (not_le.mpr b0 (le_of_eq (int.cast_eq_zero.mp (pow_eq_zero hF)))).elim, },
+  { rwa div_eq_mul_inv, }
 end

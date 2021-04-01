@@ -227,8 +227,8 @@ lemma monomial_left_inj {R : Type*} [semiring R] {a : R} (ha : a ≠ 0) {i j : �
   (monomial i a) = (monomial j a) ↔ i = j :=
 finsupp.single_left_inj ha
 
-lemma nat_cast_mul {R : Type*} [semiring R] (n : ℕ) (p : polynomial R) :
-  (n : polynomial R) * p = n • p :=
+lemma nat_cast_mul {R : Type*} [semiring R] [semimodule ℕ (polynomial R)]
+  (n : ℕ) (p : polynomial R) : (n : polynomial R) * p = n • p :=
 begin
   induction n with n ih,
   { simp, },

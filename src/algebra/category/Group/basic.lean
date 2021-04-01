@@ -146,10 +146,17 @@ def as_hom {G : AddCommGroup.{0}} (g : G) : (AddCommGroup.of ℤ) ⟶ G :=
 gmultiples_hom G g
 
 @[simp]
-lemma as_hom_apply {G : AddCommGroup.{0}} (g : G) (i : ℤ) : (as_hom g) i = i • g := rfl
+lemma as_hom_apply {G : AddCommGroup.{0}} [semimodule ℤ G] (g : G) (i : ℤ) :
+  (as_hom g) i = i • g :=
+gsmul_eq_smul i g
 
 lemma as_hom_injective {G : AddCommGroup.{0}} : function.injective (@as_hom G) :=
-λ h k w, by convert congr_arg (λ k : (AddCommGroup.of ℤ) ⟶ G, (k : ℤ → G) (1 : ℤ)) w; simp
+begin
+  letI : semimodule ℤ G := add_comm_group.int_module,
+  assume h k w,
+  convert congr_arg (λ k : (AddCommGroup.of ℤ) ⟶ G, (k : ℤ → G) (1 : ℤ)) w;
+  simp
+end
 
 @[ext]
 lemma int_hom_ext
@@ -164,6 +171,7 @@ begin
   have t0 : as_hom g₁ ≫ f = as_hom g₂ ≫ f :=
   begin
     ext,
+    letI : semimodule ℤ G := add_comm_group.int_module,
     simpa [as_hom_apply] using h,
   end,
   have t1 : as_hom g₁ = as_hom g₂ := (cancel_mono _).1 t0,

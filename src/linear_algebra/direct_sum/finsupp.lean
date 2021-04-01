@@ -25,6 +25,7 @@ variables {R : Type u} {M : Type v} {N : Type w} [ring R] [add_comm_group M] [mo
   [add_comm_group N] [module R N]
 
 section finsupp_lequiv_direct_sum
+local attribute [instance] add_comm_monoid.nat_semimodule
 
 variables (R M) (ι : Type*) [decidable_eq ι]
 

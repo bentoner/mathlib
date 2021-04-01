@@ -327,7 +327,7 @@ lemma map_swap {i j : ι} (hij : i ≠ j) :
   g (v ∘ equiv.swap i j) = - g v  :=
 eq_neg_of_add_eq_zero (g.map_swap_add v hij)
 
-lemma map_perm [fintype ι] (v : ι → M) (σ : equiv.perm ι) :
+lemma map_perm [fintype ι] [module ℤ N'] (v : ι → M) (σ : equiv.perm ι) :
   g (v ∘ σ) = (σ.sign : ℤ) • g v :=
 begin
   apply equiv.perm.swap_induction_on' σ,
@@ -336,11 +336,11 @@ begin
     simpa [g.map_swap (v ∘ s) hxy, equiv.perm.sign_swap hxy] using hI, }
 end
 
-lemma map_congr_perm [fintype ι] (σ : equiv.perm ι) :
+lemma map_congr_perm [fintype ι] [module ℤ N'] (σ : equiv.perm ι) :
   g v = (σ.sign : ℤ) • g (v ∘ σ) :=
 by { rw [g.map_perm, smul_smul], simp }
 
-lemma coe_dom_dom_congr [fintype ι] (σ : equiv.perm ι) :
+lemma coe_dom_dom_congr [fintype ι] [module ℤ N'] (σ : equiv.perm ι) :
   (g : multilinear_map R (λ _ : ι, M) N').dom_dom_congr σ
     = (σ.sign : ℤ) • (g : multilinear_map R (λ _ : ι, M) N') :=
 multilinear_map.ext $ λ v, g.map_perm v σ
@@ -375,7 +375,7 @@ namespace multilinear_map
 
 open equiv
 
-variables [fintype ι]
+variables [fintype ι] [module ℤ N']
 
 private lemma alternization_map_eq_zero_of_eq_aux
   (m : multilinear_map R (λ i : ι, M) N')
@@ -393,7 +393,8 @@ end
 
 /-- Produce an `alternating_map` out of a `multilinear_map`, by summing over all argument
 permutations. -/
-def alternatization : multilinear_map R (λ i : ι, M) N' →+ alternating_map R M N' ι :=
+def alternatization :
+  multilinear_map R (λ i : ι, M) N' →+ alternating_map R M N' ι :=
 { to_fun := λ m,
   { to_fun := ⇑(∑ (σ : perm ι), (σ.sign : ℤ) • m.dom_dom_congr σ),
     map_eq_zero_of_eq' := λ v i j hvij hij, alternization_map_eq_zero_of_eq_aux m v i j hij hvij,
@@ -429,7 +430,8 @@ namespace alternating_map
 
 /-- Alternatizing a multilinear map that is already alternating results in a scale factor of `n!`,
 where `n` is the number of inputs. -/
-lemma coe_alternatization [fintype ι] (a : alternating_map R M N' ι) :
+lemma coe_alternatization [fintype ι] [module ℤ N'] [semimodule ℕ N']
+  (a : alternating_map R M N' ι) :
   (↑a : multilinear_map R (λ ι, M) N').alternatization = nat.factorial (fintype.card ι) • a :=
 begin
   apply alternating_map.coe_inj,
@@ -444,6 +446,7 @@ end alternating_map
 namespace linear_map
 
 variables {N'₂ : Type*} [add_comm_group N'₂] [semimodule R N'₂] [fintype ι]
+[module ℤ N'] [module ℤ N'₂]
 
 /-- Composition with a linear map before and after alternatization are equivalent. -/
 lemma comp_multilinear_map_alternatization (g : N' →ₗ[R] N'₂)
@@ -466,6 +469,7 @@ variables
   [add_comm_group N₁] [semimodule R' N₁]
   [add_comm_group N₂] [semimodule R' N₂]
   [add_comm_monoid Mᵢ] [semimodule R' Mᵢ]
+  [module ℤ N₁] [module ℤ N₂]
 
 namespace equiv.perm
 
@@ -709,24 +713,26 @@ begin
   rw [multilinear_map.dom_dom_congr_mul, perm.sign_mul, units.coe_mul,
     perm.sum_congr_hom_apply, multilinear_map.dom_coprod_dom_dom_congr_sum_congr,
     perm.sign_sum_congr, units.coe_mul, ←mul_smul ↑al.sign ↑ar.sign, ←mul_smul],
-  -- resolve typeclass diamonds in `has_scalar`. `congr` alone seems to make a wrong turn.
-  congr' 3,
 end
 
 /-- Taking the `multilinear_map.alternatization` of the `multilinear_map.dom_coprod` of two
 `alternating_map`s gives a scaled version of the `alternating_map.coprod` of those maps.
 -/
-lemma multilinear_map.dom_coprod_alternization_eq
+lemma multilinear_map.dom_coprod_alternization_eq [semimodule ℕ N₁] [semimodule ℕ N₂]
   (a : alternating_map R' Mᵢ N₁ ιa) (b : alternating_map R' Mᵢ N₂ ιb) :
   (multilinear_map.dom_coprod a b : multilinear_map R' (λ _ : ιa ⊕ ιb, Mᵢ) (N₁ ⊗ N₂))
     .alternatization =
     ((fintype.card ιa).factorial * (fintype.card ιb).factorial) • a.dom_coprod b :=
 begin
-  rw [multilinear_map.dom_coprod_alternization, coe_alternatization, coe_alternatization, mul_smul,
-    ←dom_coprod'_apply, ←dom_coprod'_apply, ←tensor_product.smul_tmul', tensor_product.tmul_smul,
-    linear_map.map_smul_of_tower dom_coprod', linear_map.map_smul_of_tower dom_coprod'],
+  sorry
+  /-
+  rw [multilinear_map.dom_coprod_alternization, coe_alternatization, coe_alternatization, mul_smul],
+  rw [←dom_coprod'_apply, ←dom_coprod'_apply],
+  rw [←tensor_product.smul_tmul', tensor_product.tmul_smul],
+   rw [linear_map.map_smul_of_tower dom_coprod', linear_map.map_smul_of_tower dom_coprod'],
   -- typeclass resolution is a little confused here
   apply_instance, apply_instance,
+  -/
 end
 
 end coprod
