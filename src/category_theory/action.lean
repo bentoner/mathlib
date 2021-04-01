@@ -58,23 +58,39 @@ lemma π_map (p q : action_category M X) (f : p ⟶ q) : (π M X).map f = f.val 
 lemma π_obj (p : action_category M X) : (π M X).obj p = single_obj.star M :=
 @subsingleton.elim unit _ _ _
 
+variables {M X}
+/-- The canonical map `action_category M X → X`. It is given by `λ x, x.snd`, but
+  has a more explicit type. -/
+protected def back : action_category M X → X :=
+λ x, x.snd
+
+instance : has_coe_t X (action_category M X) :=
+⟨λ x, ⟨(), x⟩⟩
+
+@[simp] lemma coe_back (x : X) : (↑x : action_category M X).back = x := rfl
+@[simp] lemma back_coe (x : action_category M X) : ↑(x.back) = x := by ext; refl
+
+variables (M X)
 /-- An object of the action category given by M ↻ X corresponds to an element of X. -/
 def obj_equiv : X ≃ action_category M X :=
-{ to_fun := λ x, ⟨single_obj.star M, x⟩,
-  inv_fun := λ p, p.2,
-  left_inv := by tidy,
-  right_inv := by tidy }
+{ to_fun := λ x, ↑x,
+  inv_fun := λ p, p.back,
+  left_inv := coe_back,
+  right_inv := back_coe }
 
 lemma hom_as_subtype (p q : action_category M X) :
-  (p ⟶ q) = { m : M // m • (obj_equiv M X).symm p = (obj_equiv M X).symm q } := rfl
+  (p ⟶ q) = { m : M // m • p.back = q.back } := rfl
 
 instance [inhabited X] : inhabited (action_category M X) :=
-{ default := obj_equiv M X (default X) }
+{ default := ↑(default X) }
+
+instance [nonempty X] : nonempty (action_category M X) :=
+nonempty.map (obj_equiv M X) infer_instance
 
 variables {X} (x : X)
 /-- The stabilizer of a point is isomorphic to the endomorphism monoid at the
   corresponding point. In fact they are definitionally equivalent. -/
-def stabilizer_iso_End : stabilizer.submonoid M x ≃* End (obj_equiv M X x) :=
+def stabilizer_iso_End : stabilizer.submonoid M x ≃* End (↑x : action_category M X) :=
 mul_equiv.refl _
 
 @[simp]
@@ -86,11 +102,6 @@ lemma stabilizer_iso_End_symm_apply (f : End _) :
   (stabilizer_iso_End M x).inv_fun f = f := rfl
 
 variables {M X}
-
-instance : has_coe_t X (action_category M X) :=
-⟨obj_equiv M X⟩
-
-@[simp] protected lemma coe_snd (x : X) : (↑x : action_category M X).snd = x := rfl
 
 /-- A source `x` vertex and a scalar `m` determine a morphism in the action category. -/
 def hom_of_pair (s : X) (m : M) : (s : action_category M X) ⟶ (m • s : X) := ⟨m, rfl⟩
@@ -105,7 +116,7 @@ def hom_of_pair (s : X) (m : M) : (s : action_category M X) ⟶ (m • s : X) :=
 /-- Any morphism in the action category is the lift of some pair. -/
 protected def cases {P : Π ⦃a b : action_category M X⦄, (a ⟶ b) → Sort*}
   (hyp : ∀ x m, P (hom_of_pair x m)) ⦃a b⦄ (f : a ⟶ b) : P f :=
-eq.mp (by tidy) (hyp a.snd f.val)
+cast (by tidy) (hyp a.back f.val)
 
 end action_category
 end category_theory
