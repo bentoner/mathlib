@@ -59,6 +59,7 @@ variables {M : Type*} {N : Type*} {P : Type*} -- monoids
   {G : Type*} {H : Type*} -- groups
 
 -- for easy multiple inheritance
+set_option old_structure_cmd true
 
 /-- Homomorphism that preserves zero -/
 structure zero_hom (M : Type*) (N : Type*) [has_zero M] [has_zero N] :=
