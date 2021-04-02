@@ -51,7 +51,12 @@ invertible.copy (invertible.map (algebra_map S A : S →* A) (algebra_map R S r)
 when coerced to any `R`-algebra. -/
 def invertible_algebra_coe_nat (n : ℕ) [inv : invertible (n : R)] :
   invertible (n : A) :=
-by { haveI : invertible (algebra_map ℕ R n) := inv, exact invertible.algebra_tower ℕ R A n }
+begin
+  letI : algebra ℕ R := algebra_nat R,
+  letI : algebra ℕ A := algebra_nat A,
+  haveI : invertible (algebra_map ℕ R n) := inv,
+  exact invertible.algebra_tower ℕ R A n,
+end
 
 end semiring
 

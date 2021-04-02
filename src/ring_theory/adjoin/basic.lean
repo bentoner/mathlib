@@ -146,7 +146,7 @@ variables [algebra R A] {s t : set A}
 variables {R s t}
 open ring
 
-theorem adjoin_int (s : set R) : adjoin ℤ s = subalgebra_of_is_subring (closure s) :=
+theorem adjoin_int [algebra ℤ R] (s : set R) : adjoin ℤ s = subalgebra_of_is_subring (closure s) :=
 le_antisymm (adjoin_le subset_closure) (closure_subset subset_adjoin : closure s ≤ adjoin ℤ s)
 
 theorem mem_adjoin_iff {s : set A} {x : A} :
@@ -296,5 +296,8 @@ convert alg_hom.is_noetherian_ring_range _; apply_instance
 
 theorem is_noetherian_ring_closure (s : set R) (hs : s.finite) :
   @@is_noetherian_ring (ring.closure s) subset.ring :=
-show is_noetherian_ring (subalgebra_of_is_subring (ring.closure s)), from
-algebra.adjoin_int s ▸ is_noetherian_ring_of_fg (subalgebra.fg_def.2 ⟨s, hs, rfl⟩)
+begin
+  letI : algebra ℤ R := algebra_int R,
+  show is_noetherian_ring (subalgebra_of_is_subring (ring.closure s)), from
+    algebra.adjoin_int s ▸ is_noetherian_ring_of_fg (subalgebra.fg_def.2 ⟨s, hs, rfl⟩)
+end

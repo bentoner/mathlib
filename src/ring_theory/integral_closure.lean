@@ -248,6 +248,7 @@ lemma ring_hom.is_integral_of_mem_closure {x y z : S}
   f.is_integral_elem z :=
 begin
   letI : algebra R S := f.to_algebra,
+  letI : algebra ℤ R := algebra_int R,
   have := fg_mul _ _ (fg_adjoin_singleton_of_integral x hx) (fg_adjoin_singleton_of_integral y hy),
   rw [← algebra.adjoin_union_coe_submodule, set.singleton_union] at this,
   exact is_integral_of_mem_of_fg (algebra.adjoin R {x, y}) this z

@@ -131,7 +131,7 @@ omit hp
 Evaluates a polynomial whose variables come from the disjoint union of `k` copies of `ℕ`,
 with a curried evaluation `x`.
 This can be defined more generally but we use only a specific instance here. -/
-def peval {k : ℕ} (φ : mv_polynomial (fin k × ℕ) ℤ) (x : fin k → ℕ → R) : R :=
+def peval [algebra ℤ R] {k : ℕ} (φ : mv_polynomial (fin k × ℕ) ℤ) (x : fin k → ℕ → R) : R :=
 aeval (function.uncurry x) φ
 
 /--
@@ -145,7 +145,10 @@ ring operations on `𝕎 R`. For example, `witt_vector.witt_add` is such a `φ` 
 evaluating this at `(x₀, x₁)` gives us the sum of two Witt vectors `x₀ + x₁`.
 -/
 def eval {k : ℕ} (φ : ℕ → mv_polynomial (fin k × ℕ) ℤ) (x : fin k → 𝕎 R) : 𝕎 R :=
-mk p $ λ n, peval (φ n) $ λ i, (x i).coeff
+begin
+  letI : algebra ℤ R := algebra_int R,
+  exact mk p (λ n, peval (φ n) (λ i, (x i).coeff))
+end
 
 variables (R) [fact p.prime]
 
@@ -272,7 +275,9 @@ end witt_structure_simplifications
 
 section coeff
 
+section
 variables (p R)
+local attribute [instance] algebra_int
 
 @[simp] lemma zero_coeff (n : ℕ) : (0 : 𝕎 R).coeff n = 0 :=
 show (aeval _ (witt_zero p n) : R) = 0,
@@ -286,7 +291,7 @@ by simp only [witt_one_zero_eq_one, alg_hom.map_one]
 show (aeval _ (witt_one p n) : R) = 0,
 by simp only [hn, witt_one_pos_eq_zero, alg_hom.map_zero]
 
-variables {p R}
+end
 
 omit hp
 @[simp]
@@ -295,21 +300,37 @@ lemma v2_coeff {p' R'} (x y : witt_vector p' R') (i : fin 2) :
 by fin_cases i; simp
 include hp
 
-lemma add_coeff (x y : 𝕎 R) (n : ℕ) :
+lemma add_coeff [algebra ℤ R] (x y : 𝕎 R) (n : ℕ) :
   (x + y).coeff n = peval (witt_add p n) ![x.coeff, y.coeff] :=
-by simp [(+), eval]
+begin
+  simp only [has_add.add, eval, v2_coeff],
+  congr,
+  exact subsingleton.elim (algebra_int R) _inst_2
+end
 
-lemma sub_coeff (x y : 𝕎 R) (n : ℕ) :
+lemma sub_coeff [algebra ℤ R] (x y : 𝕎 R) (n : ℕ) :
   (x - y).coeff n = peval (witt_sub p n) ![x.coeff, y.coeff] :=
-by simp [has_sub.sub, eval]
+begin
+  simp only [has_sub.sub, eval, v2_coeff],
+  congr,
+  exact subsingleton.elim (algebra_int R) _inst_2
+end
 
-lemma mul_coeff (x y : 𝕎 R) (n : ℕ) :
+lemma mul_coeff [algebra ℤ R] (x y : 𝕎 R) (n : ℕ) :
   (x * y).coeff n = peval (witt_mul p n) ![x.coeff, y.coeff] :=
-by simp [(*), eval]
+begin
+  simp only [has_mul.mul, eval, v2_coeff],
+  congr,
+  exact subsingleton.elim (algebra_int R) _inst_2
+end
 
-lemma neg_coeff (x : 𝕎 R) (n : ℕ) :
+lemma neg_coeff [algebra ℤ R] (x : 𝕎 R) (n : ℕ) :
   (-x).coeff n = peval (witt_neg p n) ![x.coeff] :=
-by simp [has_neg.neg, eval, matrix.cons_fin_one]
+begin
+  simp only [has_neg.neg, eval, matrix.cons_fin_one],
+  congr,
+  exact subsingleton.elim (algebra_int R) _inst_2
+end
 
 end coeff
 

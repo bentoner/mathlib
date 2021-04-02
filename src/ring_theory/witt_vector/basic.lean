@@ -134,7 +134,10 @@ producing a value in `R`.
 This function will be bundled as the ring homomorphism `witt_vector.ghost_map`
 once the ring structure is available,
 but we rely on it to set up the ring structure in the first place. -/
-private def ghost_fun : 𝕎 R → (ℕ → R) := λ x n, aeval x.coeff (W_ ℤ n)
+private def ghost_fun : 𝕎 R → (ℕ → R) := λ x n, begin
+  letI : algebra ℤ R := algebra_int R,
+  exact aeval x.coeff (W_ ℤ n)
+end
 
 section ghost_fun
 include hp

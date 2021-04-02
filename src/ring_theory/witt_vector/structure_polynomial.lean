@@ -322,7 +322,7 @@ theorem witt_structure_int_exists_unique (Φ : mv_polynomial idx ℤ) :
   ∀ (n : ℕ), bind₁ φ (witt_polynomial p ℤ n) = bind₁ (λ i : idx, (rename (prod.mk i) (W_ ℤ n))) Φ :=
 ⟨witt_structure_int p Φ, witt_structure_int_prop _ _, eq_witt_structure_int _ _⟩
 
-theorem witt_structure_prop (Φ : mv_polynomial idx ℤ) (n) :
+theorem witt_structure_prop [algebra ℤ R] (Φ : mv_polynomial idx ℤ) (n) :
   aeval (λ i, map (int.cast_ring_hom R) (witt_structure_int p Φ i)) (witt_polynomial p ℤ n) =
   aeval (λ i, rename (prod.mk i) (W n)) Φ :=
 begin

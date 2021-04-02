@@ -230,7 +230,8 @@ by { ext A x y, simp }
 
 /-- The flip of a bilinear form over a ring, obtained by exchanging the left and right arguments,
 here considered as an `ℕ`-linear equivalence, i.e. an additive equivalence. -/
-abbreviation flip' : bilin_form R M ≃ₗ[ℕ] bilin_form R M := flip_hom ℕ
+abbreviation flip' [algebra ℕ R] :
+  bilin_form R M ≃ₗ[ℕ] bilin_form R M := flip_hom ℕ
 
 /-- The `flip` of a bilinear form over a commutative ring, obtained by exchanging the left and
 right arguments. -/
@@ -268,17 +269,26 @@ rfl
 /-- The linear map obtained from a `bilin_form` by fixing the left co-ordinate and evaluating in
 the right.
 Over a commutative semiring, use `to_lin`, which is linear rather than `ℕ`-linear. -/
-abbreviation to_lin' : bilin_form R M →ₗ[ℕ] M →ₗ[ℕ] M →ₗ[R] R := to_lin_hom ℕ
+abbreviation to_lin' [algebra ℕ R] [semimodule ℕ M] :
+  bilin_form R M →ₗ[ℕ] M →ₗ[ℕ] M →ₗ[R] R := to_lin_hom ℕ
 
 @[simp]
 lemma sum_left {α} (t : finset α) (g : α → M) (w : M) :
   B (∑ i in t, g i) w = ∑ i in t, B (g i) w :=
-(bilin_form.to_lin' B).map_sum₂ t g w
+begin
+  letI : algebra ℕ R := algebra_nat R,
+  letI : semimodule ℕ M := add_comm_monoid.nat_semimodule,
+  exact (bilin_form.to_lin' B).map_sum₂ t g w
+end
 
 @[simp]
 lemma sum_right {α} (t : finset α) (w : M) (g : α → M) :
   B w (∑ i in t, g i) = ∑ i in t, B w (g i) :=
-(bilin_form.to_lin' B w).map_sum
+begin
+  letI : algebra ℕ R := algebra_nat R,
+  letI : semimodule ℕ M := add_comm_monoid.nat_semimodule,
+  exact (bilin_form.to_lin' B w).map_sum
+end
 
 variables (R₂)
 
@@ -300,7 +310,8 @@ rfl
 /-- The linear map obtained from a `bilin_form` by fixing the right co-ordinate and evaluating in
 the left.
 Over a commutative semiring, use `to_lin_flip`, which is linear rather than `ℕ`-linear. -/
-abbreviation to_lin'_flip : bilin_form R M →ₗ[ℕ] M →ₗ[ℕ] M →ₗ[R] R := to_lin_hom_flip ℕ
+abbreviation to_lin'_flip [algebra ℕ R] [semimodule ℕ M] :
+  bilin_form R M →ₗ[ℕ] M →ₗ[ℕ] M →ₗ[R] R := to_lin_hom_flip ℕ
 
 end to_lin'
 

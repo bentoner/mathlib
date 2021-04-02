@@ -332,11 +332,13 @@ begin
   { exact monic_map _ (monic hx) }
 end
 
+instance : algebra ℤ ℚ := algebra_int ℚ
+
 /-- The minimal polynomial over `ℤ` is the same as the minimal polynomial over `ℚ`. -/
 --TODO use `gcd_domain_eq_field_fractions` directly when localizations are defined
 -- in terms of algebras instead of `ring_hom`s
-lemma over_int_eq_over_rat {A : Type*} [integral_domain A] {x : A} [hℚA : algebra ℚ A]
-  (hx : is_integral ℤ x) :
+lemma over_int_eq_over_rat {A : Type*} [integral_domain A] {x : A}
+  [algebra ℚ A] [algebra ℤ A] (hx : is_integral ℤ x) :
   minpoly ℚ x = map (int.cast_ring_hom ℚ) (minpoly ℤ x) :=
 begin
   refine (unique' (@is_integral_of_is_scalar_tower ℤ ℚ A _ _ _ _ _ _ _ x hx) _ _ _).symm,
@@ -368,7 +370,8 @@ end
 as root. -/
 -- TODO use `gcd_domain_dvd` directly when localizations are defined in terms of algebras
 -- instead of `ring_hom`s
-lemma integer_dvd {A : Type*} [integral_domain A] [algebra ℚ A] {x : A} (hx : is_integral ℤ x)
+lemma integer_dvd {A : Type*} [integral_domain A] [algebra ℚ A] [algebra ℤ A] {x : A}
+  (hx : is_integral ℤ x)
   {P : polynomial ℤ} (hprim : is_primitive P) (hroot : polynomial.aeval x P = 0) :
   minpoly ℤ x ∣ P :=
 begin

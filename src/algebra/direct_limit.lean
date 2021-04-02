@@ -200,6 +200,8 @@ namespace add_comm_group
 variables [Π i, add_comm_group (G i)]
 include dec_ι
 
+local attribute [instance] add_comm_group.int_module
+
 /-- The direct limit of a directed system is the abelian groups glued together along the maps. -/
 def direct_limit (f : Π i j, i ≤ j → G i →+ G j) : Type* :=
 @module.direct_limit ℤ _ ι _ _ G _ _
@@ -224,44 +226,71 @@ module.direct_limit.add_comm_group G (λ i j hij, (f i j hij).to_int_linear_map)
 
 instance : inhabited (direct_limit G f) := ⟨0⟩
 
+local attribute [-instance] add_comm_group.int_module
+
 /-- The canonical map from a component to the direct limit. -/
-def of (i) : G i →ₗ[ℤ] direct_limit G f :=
-module.direct_limit.of ℤ ι G (λ i j hij, (f i j hij).to_int_linear_map) i
+def of (i : ι) : G i →+ direct_limit G f :=
+begin
+  letI : ∀ j, module ℤ (G j) := λ j, add_comm_group.int_module,
+  exact (module.direct_limit.of ℤ ι G (λ i j hij, (f i j hij).to_int_linear_map) i)
+    .to_add_monoid_hom,
+end
+
 variables {G f}
 
 @[simp] lemma of_f {i j} (hij) (x) : of G f j (f i j hij x) = of G f i x :=
-module.direct_limit.of_f
+begin
+  letI : ∀ j, module ℤ (G j) := λ j, add_comm_group.int_module,
+  exact module.direct_limit.of_f
+end
 
 @[elab_as_eliminator]
 protected theorem induction_on [nonempty ι] {C : direct_limit G f → Prop} (z : direct_limit G f)
   (ih : ∀ i x, C (of G f i x)) : C z :=
-module.direct_limit.induction_on z ih
+begin
+  letI : ∀ j, module ℤ (G j) := λ j, add_comm_group.int_module,
+  exact module.direct_limit.induction_on z ih
+end
 
 /-- A component that corresponds to zero in the direct limit is already zero in some
 bigger module in the directed system. -/
 theorem of.zero_exact [directed_system G (λ i j h, f i j h)] (i x) (h : of G f i x = 0) :
   ∃ j hij, f i j hij x = 0 :=
-module.direct_limit.of.zero_exact h
+begin
+  letI : ∀ j, module ℤ (G j) := λ j, add_comm_group.int_module,
+  exact module.direct_limit.of.zero_exact h
+end
 
 variables (P : Type u₁) [add_comm_group P]
 variables (g : Π i, G i →+ P)
 variables (Hg : ∀ i j hij x, g j (f i j hij x) = g i x)
-
 variables (G f)
+include g Hg
+
 /-- The universal property of the direct limit: maps from the components to another abelian group
 that respect the directed system structure (i.e. make some diagram commute) give rise
 to a unique map out of the direct limit. -/
-def lift : direct_limit G f →ₗ[ℤ] P :=
-module.direct_limit.lift ℤ ι G (λ i j hij, (f i j hij).to_int_linear_map)
-  (λ i, (g i).to_int_linear_map) Hg
+def lift : direct_limit G f →+ P :=
+begin
+  letI : ∀ j, module ℤ (G j) := λ j, add_comm_group.int_module,
+  letI : module ℤ P := add_comm_group.int_module,
+  exact (module.direct_limit.lift ℤ ι G (λ i j hij, (f i j hij).to_int_linear_map)
+    (λ i, (g i).to_int_linear_map) Hg).to_add_monoid_hom
+end
+
 variables {G f}
 
 @[simp] lemma lift_of (i x) : lift G f P g Hg (of G f i x) = g i x :=
-module.direct_limit.lift_of _ _ _
+begin
+  letI : ∀ j, module ℤ (G j) := λ j, add_comm_group.int_module,
+  letI : module ℤ P := add_comm_group.int_module,
+  have Hg' : ∀ i j hij x, (g j).to_int_linear_map ((f i j hij).to_int_linear_map x)
+    = (g i).to_int_linear_map x := Hg,
+  exact module.direct_limit.lift_of (λ i, (g i).to_int_linear_map) Hg' x
+end
 
 lemma lift_unique [nonempty ι] (F : direct_limit G f →+ P) (x) :
-  F x = lift G f P (λ i, F.comp (of G f i).to_add_monoid_hom)
-    (λ i j hij x, by simp) x :=
+  F x = lift G f P (λ i, F.comp (of G f i)) (λ i j hij x, by simp) x :=
 direct_limit.induction_on x $ λ i x, by simp
 
 end direct_limit
