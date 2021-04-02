@@ -337,8 +337,8 @@ begin
       ←add_monoid_hom.comp_apply, dfinsupp.comp_sum_add_hom], },
   conv_rhs {
     rw [add_monoid_hom.comp_apply, add_monoid_hom.comp_apply, add_monoid_hom.comp_apply,
-      add_monoid_hom.eval_apply, add_monoid_hom.comp_hom_apply_apply, add_monoid_hom.comp_apply,
-      dfinsupp.single_add_hom_apply, dfinsupp.sum_add_hom_single,
+      add_monoid_hom.eval_apply_apply, add_monoid_hom.comp_hom_apply_apply,
+      add_monoid_hom.comp_apply, dfinsupp.single_add_hom_apply, dfinsupp.sum_add_hom_single,
       add_monoid_hom.dfinsupp_sum_add_hom_apply], },
 
   -- unpack `a`
@@ -347,8 +347,8 @@ begin
 
   conv_lhs {
     rw [add_monoid_hom.comp_apply, add_monoid_hom.comp_apply, add_monoid_hom.comp_apply,
-      add_monoid_hom.eval_apply, add_monoid_hom.comp_hom_apply_apply, add_monoid_hom.comp_apply,
-      dfinsupp.single_add_hom_apply, dfinsupp.sum_add_hom_single], },
+      add_monoid_hom.eval_apply_apply, add_monoid_hom.comp_hom_apply_apply,
+      add_monoid_hom.comp_apply, dfinsupp.single_add_hom_apply, dfinsupp.sum_add_hom_single], },
 
   exact dfinsupp.single_eq_of_sigma_eq (gmonoid.mul_assoc ⟨ai, ax⟩ ⟨bi, bx⟩ ⟨ci, cx⟩),
 end
