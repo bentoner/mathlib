@@ -73,7 +73,7 @@ lemma surjective (f : α → β) (hf : surjective f) : surjective (map_fun f : �
 λ x, ⟨mk _ (λ n, classical.some $ hf $ x.coeff n),
 by { ext n, dsimp [map_fun], rw classical.some_spec (hf (x.coeff n)) }⟩
 
-variables (f : R →+* S) (x y : 𝕎 R)
+variables [algebra ℤ R] [algebra ℤ S] (f : R →+* S) (x y : 𝕎 R)
 
 /-- Auxiliary tactic for showing that `map_fun` respects the ring operations. -/
 meta def map_fun_tac : tactic unit :=
@@ -88,7 +88,7 @@ include hp
 
 /- We do not tag these lemmas as `@[simp]` because they will be bundled in `map` later on. -/
 
-lemma zero : map_fun f (0 : 𝕎 R) = 0 := by map_fun_tac
+lemma zero  : map_fun f (0 : 𝕎 R) = 0 := by map_fun_tac
 
 lemma one : map_fun f (1 : 𝕎 R) = 1 := by map_fun_tac
 
@@ -121,7 +121,7 @@ fn ← to_expr ```(%%fn : fin _ → ℕ → R),
   witt_vector.has_sub witt_sub
   witt_vector.has_add witt_add
   ],
-to_expr ```(congr_fun (congr_arg (@peval R _ %%k) (witt_structure_int_prop p %%φ n)) %%fn) >>=
+to_expr ```(congr_fun (congr_arg (@peval R _ _ %%k) (witt_structure_int_prop p %%φ n)) %%fn) >>=
   note `this none,
 `[simpa [ghost_fun, aeval_rename, aeval_bind₁, (∘), uncurry, peval, eval] using this]
 
@@ -129,15 +129,14 @@ end tactic
 
 namespace witt_vector
 
+variable [algebra ℤ R]
+
 /-- Evaluates the `n`th Witt polynomial on the first `n` coefficients of `x`,
 producing a value in `R`.
 This function will be bundled as the ring homomorphism `witt_vector.ghost_map`
 once the ring structure is available,
 but we rely on it to set up the ring structure in the first place. -/
-private def ghost_fun : 𝕎 R → (ℕ → R) := λ x n, begin
-  letI : algebra ℤ R := algebra_int R,
-  exact aeval x.coeff (W_ ℤ n)
-end
+private def ghost_fun : 𝕎 R → (ℕ → R) := λ x n, aeval x.coeff (W_ ℤ n)
 
 section ghost_fun
 include hp
@@ -212,7 +211,7 @@ instance : comm_ring (𝕎 R) :=
 (map_fun.surjective _ $ counit_surjective _).comm_ring_sub (map_fun $ mv_polynomial.counit _)
   (map_fun.zero _) (map_fun.one _) (map_fun.add _) (map_fun.mul _) (map_fun.neg _) (map_fun.sub _)
 
-variables {p R}
+variables {p R} [algebra ℤ S]
 
 /-- `witt_vector.map f` is the ring homomorphism `𝕎 R →+* 𝕎 S` naturally induced
 by a ring homomorphism `f : R →+* S`. It acts coefficientwise. -/

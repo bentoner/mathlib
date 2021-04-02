@@ -221,39 +221,44 @@ and the `@[is_poly]` attribute derives certain specialized composition instances
 for declarations of type `is_poly f`.
 For the most part, users are not expected to treat `is_poly` as a class.
 -/
-class is_poly (f : Π ⦃R⦄ [comm_ring R], witt_vector p R → 𝕎 R) : Prop :=
-mk' :: (poly : ∃ φ : ℕ → mv_polynomial ℕ ℤ, ∀ ⦃R⦄ [comm_ring R] (x : 𝕎 R),
+class is_poly (f : Π ⦃R⦄ [comm_ring R] [algebra ℤ R], witt_vector p R → 𝕎 R) : Prop :=
+mk' :: (poly : ∃ φ : ℕ → mv_polynomial ℕ ℤ, ∀ ⦃R⦄ [comm_ring R] [algebra ℤ R] (x : 𝕎 R),
   by exactI (f x).coeff = λ n, aeval x.coeff (φ n))
 
 /-- The identity function on Witt vectors is a polynomial function. -/
-instance id_is_poly : is_poly p (λ _ _, id) :=
+instance id_is_poly : is_poly p (λ _ _ _, id) :=
 ⟨⟨X, by { introsI, simp only [aeval_X, id] }⟩⟩
 
-instance id_is_poly_i' : is_poly p (λ _ _ a, a) :=
+instance id_is_poly_i' : is_poly p (λ _ _ _ a, a) :=
 witt_vector.id_is_poly _
 
 namespace is_poly
 
-instance : inhabited (is_poly p (λ _ _, id)) :=
+instance : inhabited (is_poly p (λ _ _ _, id)) :=
 ⟨witt_vector.id_is_poly p⟩
 
 variables {p}
 include hp
 lemma ext {f g} (hf : is_poly p f) (hg : is_poly p g)
-  (h : ∀ (R : Type u) [_Rcr : comm_ring R] (x : 𝕎 R) (n : ℕ),
+  (h : ∀ (R : Type u) [_Rcr : comm_ring R]
+    [@algebra ℤ R _ (@ring.to_semiring R (@comm_ring.to_ring _ _Rcr))]
+   (x : 𝕎 R) (n : ℕ),
     by exactI ghost_component n (f x) = ghost_component n (g x)) :
-  ∀ (R : Type u) [_Rcr : comm_ring R] (x : 𝕎 R), by exactI f x = g x :=
+  ∀ (R : Type u) [_Rcr : comm_ring R]
+  [@algebra ℤ R _ (@ring.to_semiring R (@comm_ring.to_ring _ _Rcr))] (x : 𝕎 R),
+  by exactI f x = g x :=
 begin
   unfreezingI
   { obtain ⟨φ, hf⟩ := hf,
     obtain ⟨ψ, hg⟩ := hg },
-  intros,
+  introsI,
   ext n,
   rw [hf, hg, poly_eq_of_witt_polynomial_bind_eq p φ ψ],
   intro k,
   apply mv_polynomial.funext,
   intro x,
   simp only [hom_bind₁],
+  letI : algebra ℤ (ulift.{u} ℤ) := algebra_int _,
   specialize h (ulift ℤ) (mk p $ λ i, ⟨x i⟩) k,
   simp only [ghost_component_apply, aeval_eq_eval₂_hom] at h,
   apply (ulift.ring_equiv.{0 u}).symm.injective,
@@ -273,14 +278,14 @@ omit hp
 
 /-- The composition of polynomial functions is polynomial. -/
 lemma comp {g f} (hg : is_poly p g) (hf : is_poly p f) :
-  is_poly p (λ R _Rcr, @g R _Rcr ∘ @f R _Rcr) :=
+  is_poly p (λ R _Rcr _Ra, @g R _Rcr _Ra ∘ @f R _Rcr _Ra) :=
 begin
   unfreezingI
   { obtain ⟨φ, hf⟩ := hf,
     obtain ⟨ψ, hg⟩ := hg },
   use (λ n, bind₁ φ (ψ n)),
-  intros,
-  simp only [aeval_bind₁, function.comp, hg, hf]
+  introsI,
+  simp only [aeval_bind₁, function.comp, hg, hf],
 end
 
 end is_poly
@@ -297,16 +302,16 @@ and the `@[is_poly]` attribute derives certain specialized composition instances
 for declarations of type `is_poly₂ f`.
 For the most part, users are not expected to treat `is_poly₂` as a class.
 -/
-class is_poly₂ (f : Π ⦃R⦄ [comm_ring R], witt_vector p R → 𝕎 R → 𝕎 R) : Prop :=
-mk' :: (poly : ∃ φ : ℕ → mv_polynomial (fin 2 × ℕ) ℤ, ∀ ⦃R⦄ [comm_ring R] (x y : 𝕎 R),
-  by exactI (f x y).coeff = λ n, peval (φ n) ![x.coeff, y.coeff])
+class is_poly₂ (f : Π ⦃R⦄ [comm_ring R] [algebra ℤ R], witt_vector p R → 𝕎 R → 𝕎 R) : Prop :=
+mk' :: (poly : ∃ φ : ℕ → mv_polynomial (fin 2 × ℕ) ℤ, ∀ ⦃R⦄ [comm_ring R] [algebra ℤ R]
+  (x y : 𝕎 R), by exactI (f x y).coeff = λ n, peval (φ n) ![x.coeff, y.coeff])
 
 
 variable {p}
 
 /-- The composition of polynomial functions is polynomial. -/
 lemma is_poly₂.comp {h f g} (hh : is_poly₂ p h) (hf : is_poly p f) (hg : is_poly p g) :
-  is_poly₂ p (λ R _Rcr x y, by exactI h (f x) (g y)) :=
+  is_poly₂ p (λ R _Rcr _Ra x y, by exactI h (f x) (g y)) :=
 begin
   unfreezingI
   { obtain ⟨φ, hf⟩ := hf,
@@ -315,7 +320,7 @@ begin
   refine ⟨⟨(λ n, bind₁ (uncurry $
           ![λ k, rename (prod.mk (0 : fin 2)) (φ k),
             λ k, rename (prod.mk (1 : fin 2)) (ψ k)]) (χ n)), _⟩⟩,
-  intros,
+  introsI,
   funext n,
   simp only [peval, aeval_bind₁, function.comp, hh, hf, hg, uncurry],
   apply eval₂_hom_congr rfl _ rfl,
@@ -327,23 +332,23 @@ end
 
 /-- The composition of a polynomial function with a binary polynomial function is polynomial. -/
 lemma is_poly.comp₂ {g f} (hg : is_poly p g) (hf : is_poly₂ p f) :
-  is_poly₂ p (λ R _Rcr x y, by exactI g (f x y)) :=
+  is_poly₂ p (λ R _Rcr _Ra x y, by exactI g (f x y)) :=
 begin
   unfreezingI
   { obtain ⟨φ, hf⟩ := hf,
     obtain ⟨ψ, hg⟩ := hg },
   use (λ n, bind₁ φ (ψ n)),
-  intros,
+  introsI,
   simp only [peval, aeval_bind₁, function.comp, hg, hf]
 end
 
 /-- The diagonal `λ x, f x x` of a polynomial function `f` is polynomial. -/
 lemma is_poly₂.diag {f} (hf : is_poly₂ p f) :
-  is_poly p (λ R _Rcr x, by exactI f x x) :=
+  is_poly p (λ R _Rcr _Ra x, by exactI f x x) :=
 begin
   unfreezingI {obtain ⟨φ, hf⟩ := hf},
   refine ⟨⟨λ n, bind₁ (uncurry ![X, X]) (φ n), _⟩⟩,
-  intros, funext n,
+  introsI, funext n,
   simp only [hf, peval, uncurry, aeval_bind₁],
   apply eval₂_hom_congr rfl _ rfl,
   ext ⟨i, k⟩, fin_cases i;
@@ -464,7 +469,7 @@ Users are expected to use the non-instance versions manually.
 
 /-- The additive negation is a polynomial function on Witt vectors. -/
 @[is_poly]
-lemma neg_is_poly : is_poly p (λ R _, by exactI @has_neg.neg (𝕎 R) _) :=
+lemma neg_is_poly : is_poly p (λ R _ _, by exactI @has_neg.neg (𝕎 R) _) :=
 ⟨⟨λ n, rename prod.snd (witt_neg p n),
 begin
   introsI, funext n,
@@ -505,7 +510,7 @@ begin
 end
 
 /-- The function that is constantly one on Witt vectors is a polynomial function. -/
-instance one_is_poly : is_poly p (λ _ _ _, by exactI 1) :=
+instance one_is_poly : is_poly p (λ _ _ _ _, by exactI 1) :=
 ⟨⟨one_poly,
 begin
   introsI, funext n, cases n,
@@ -519,18 +524,18 @@ end zero_one
 omit hp
 
 /-- Addition of Witt vectors is a polynomial function. -/
-@[is_poly] lemma add_is_poly₂ [fact p.prime] : is_poly₂ p (λ _ _, by exactI (+)) :=
+@[is_poly] lemma add_is_poly₂ [fact p.prime] : is_poly₂ p (λ _ _ _, by exactI (+)) :=
 ⟨⟨witt_add p, by { introsI, dunfold witt_vector.has_add, simp [eval] }⟩⟩
 
 
 /-- Multiplication of Witt vectors is a polynomial function. -/
-@[is_poly] lemma mul_is_poly₂ [fact p.prime] : is_poly₂ p (λ _ _, by exactI (*)) :=
+@[is_poly] lemma mul_is_poly₂ [fact p.prime] : is_poly₂ p (λ _ _ _, by exactI (*)) :=
 ⟨⟨witt_mul p, by { introsI, dunfold witt_vector.has_mul, simp [eval] }⟩⟩
 
 include hp
 
 -- unfortunately this is not universe polymorphic, merely because `f` isn't
-lemma is_poly.map {f} (hf : is_poly p f) (g : R →+* S) (x : 𝕎 R) :
+lemma is_poly.map [algebra ℤ R] [algebra ℤ S] {f} (hf : is_poly p f) (g : R →+* S) (x : 𝕎 R) :
   map g (f x) = f (map g x) :=
 begin
   -- this could be turned into a tactic “macro” (taking `hf` as parameter)
@@ -552,21 +557,23 @@ variables {p}
 /-- The composition of a binary polynomial function
  with a unary polynomial function in the first argument is polynomial. -/
 lemma comp_left {g f} (hg : is_poly₂ p g) (hf : is_poly p f) :
-  is_poly₂ p (λ R _Rcr x y, by exactI g (f x) y) :=
+  is_poly₂ p (λ R _Rcr _Ra x y, by exactI g (f x) y) :=
 hg.comp hf (witt_vector.id_is_poly _)
 
 /-- The composition of a binary polynomial function
  with a unary polynomial function in the second argument is polynomial. -/
 lemma comp_right {g f} (hg : is_poly₂ p g) (hf : is_poly p f) :
-  is_poly₂ p (λ R _Rcr x y, by exactI g x (f y)) :=
+  is_poly₂ p (λ R _Rcr _Ra x y, by exactI g x (f y)) :=
 hg.comp (witt_vector.id_is_poly p) hf
 
 include hp
 
 lemma ext {f g} (hf : is_poly₂ p f) (hg : is_poly₂ p g)
-  (h : ∀ (R : Type u) [_Rcr : comm_ring R] (x y : 𝕎 R) (n : ℕ),
+  (h : ∀ (R : Type u) [_Rcr : comm_ring R]
+    [@algebra ℤ R _ (@ring.to_semiring R (@comm_ring.to_ring _ _Rcr))] (x y : 𝕎 R) (n : ℕ),
     by exactI ghost_component n (f x y) = ghost_component n (g x y)) :
-  ∀ (R) [_Rcr : comm_ring R] (x y : 𝕎 R), by exactI f x y = g x y :=
+  ∀ (R) [_Rcr : comm_ring R] [@algebra ℤ R _ (@ring.to_semiring R (@comm_ring.to_ring _ _Rcr))]
+  (x y : 𝕎 R), by exactI f x y = g x y :=
 begin
   unfreezingI
   { obtain ⟨φ, hf⟩ := hf,
@@ -579,6 +586,7 @@ begin
   apply mv_polynomial.funext,
   intro x,
   simp only [hom_bind₁],
+  letI : algebra ℤ (ulift.{u} ℤ) := algebra_int _,
   specialize h (ulift ℤ) (mk p $ λ i, ⟨x (0, i)⟩) (mk p $ λ i, ⟨x (1, i)⟩) k,
   simp only [ghost_component_apply, aeval_eq_eval₂_hom] at h,
   apply (ulift.ring_equiv.{0 u}).symm.injective,
@@ -596,7 +604,7 @@ begin
 end
 
 -- unfortunately this is not universe polymorphic, merely because `f` isn't
-lemma map {f} (hf : is_poly₂ p f) (g : R →+* S) (x y : 𝕎 R) :
+lemma map [algebra ℤ R] [algebra ℤ S] {f} (hf : is_poly₂ p f) (g : R →+* S) (x y : 𝕎 R) :
   map g (f x y) = f (map g x) (map g y) :=
 begin
   -- this could be turned into a tactic “macro” (taking `hf` as parameter)

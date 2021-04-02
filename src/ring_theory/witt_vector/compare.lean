@@ -141,6 +141,8 @@ open truncated_witt_vector
 
 variables (p)
 
+instance : algebra ℤ (zmod p) := algebra_int _
+
 /--
 `to_zmod_pow` is a family of compatible ring homs. We get this family by composing
 `truncated_witt_vector.zmod_equiv_trunc` (in right-to-left direction)

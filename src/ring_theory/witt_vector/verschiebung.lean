@@ -49,12 +49,12 @@ by rw [verschiebung_fun_coeff, if_pos rfl]
 
 include hp
 
-@[ghost_simps] lemma ghost_component_zero_verschiebung_fun (x : 𝕎 R) :
+@[ghost_simps] lemma ghost_component_zero_verschiebung_fun [algebra ℤ R] (x : 𝕎 R) :
   ghost_component 0 (verschiebung_fun x) = 0 :=
 by rw [ghost_component_apply, aeval_witt_polynomial, finset.range_one, finset.sum_singleton,
        verschiebung_fun_coeff_zero, pow_zero, pow_zero, pow_one, one_mul]
 
-@[ghost_simps] lemma ghost_component_verschiebung_fun (x : 𝕎 R) (n : ℕ) :
+@[ghost_simps] lemma ghost_component_verschiebung_fun [algebra ℤ R] (x : 𝕎 R) (n : ℕ) :
   ghost_component (n + 1) (verschiebung_fun x) = p * ghost_component n x :=
 begin
   simp only [ghost_component_apply, aeval_witt_polynomial],
@@ -77,7 +77,7 @@ if n = 0 then 0 else X (n-1)
 @[simp] lemma verschiebung_poly_zero :
   verschiebung_poly 0 = 0 := rfl
 
-lemma aeval_verschiebung_poly' (x : 𝕎 R) (n : ℕ) :
+lemma aeval_verschiebung_poly' [algebra ℤ R] (x : 𝕎 R) (n : ℕ) :
   aeval x.coeff (verschiebung_poly n) = (verschiebung_fun x).coeff n :=
 begin
  cases n,
@@ -91,13 +91,14 @@ variable (p)
 /--
 `witt_vector.verschiebung` has polynomial structure given by `witt_vector.verschiebung_poly`.
 -/
-@[is_poly] lemma verschiebung_fun_is_poly : is_poly p (λ R _Rcr, @verschiebung_fun p R _Rcr) :=
+@[is_poly] lemma verschiebung_fun_is_poly : is_poly p (λ R _Rcr _Ra, @verschiebung_fun p R _Rcr) :=
 begin
   use verschiebung_poly,
+  introsI,
   simp only [aeval_verschiebung_poly', eq_self_iff_true, forall_3_true_iff]
 end
 
-variable {p}
+variables {p}
 include hp
 
 /--
@@ -107,22 +108,21 @@ include hp
 This is a additive monoid hom with underlying function `verschiebung_fun`.
 -/
 noncomputable
-def verschiebung : 𝕎 R →+ 𝕎 R :=
+def verschiebung [algebra ℤ R] : 𝕎 R →+ 𝕎 R :=
 { to_fun := verschiebung_fun,
   map_zero' :=
   by ext ⟨⟩; rw [verschiebung_fun_coeff]; simp only [if_true, eq_self_iff_true, zero_coeff, if_t_t],
-  map_add' := by { ghost_calc _ _, rintro ⟨⟩; ghost_simp } }
-
-omit hp
+  map_add' := by { ghost_calc _ _, rintro ⟨⟩; ghost_simp, sorry } }
 
 /-- `witt_vector.verschiebung` is a polynomial function. -/
-@[is_poly] lemma verschiebung_is_poly : is_poly p (λ R _Rcr, @verschiebung p R hp _Rcr) :=
+@[is_poly] lemma verschiebung_is_poly :
+  is_poly p (λ R _Rcr _Ra, by exactI @verschiebung p R hp _Rcr _Ra) :=
 verschiebung_fun_is_poly p
 
-include hp
+variable [algebra ℤ R]
 
 /-- verschiebung is a natural transformation -/
-@[simp] lemma map_verschiebung (f : R →+* S) (x : 𝕎 R) :
+@[simp] lemma map_verschiebung [algebra ℤ S] (f : R →+* S) (x : 𝕎 R) :
   map f (verschiebung x) = verschiebung (map f x) :=
 by { ext ⟨-, -⟩, exact f.map_zero, refl }
 
@@ -168,8 +168,7 @@ begin
       funext k,
       exact eval₂_hom_congr (ring_hom.ext_int _ _) rfl rfl },
     { rw [ghost_component_verschiebung],
-      congr' 1,
-      exact eval₂_hom_congr (ring_hom.ext_int _ _) rfl rfl } }
+      congr' 1 } }
 end
 
 end witt_vector

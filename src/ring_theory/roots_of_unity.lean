@@ -769,7 +769,8 @@ section minpoly
 
 open minpoly
 
-variables {n : ℕ} {K : Type*} [field K] {μ : K} (h : is_primitive_root μ n) (hpos : 0 < n)
+variables {n : ℕ} {K : Type*} [field K] [algebra ℤ K]
+{μ : K} (h : is_primitive_root μ n) (hpos : 0 < n)
 
 include n μ h hpos
 
@@ -933,13 +934,13 @@ end
 then the minimal polynomial of a primitive `n`-th root of unity `μ`
 has `μ ^ m` as root. -/
 lemma pow_is_root_minpoly {m : ℕ} (hcop : nat.coprime m n) :
-  is_root (map (int.cast_ring_hom K) (minpoly ℤ μ)) (μ ^ m) :=
+  is_root (map (algebra_map ℤ K) (minpoly ℤ μ)) (μ ^ m) :=
 by simpa [minpoly_eq_pow_coprime h hpos hcop, eval_map, aeval_def (μ ^ m) _]
   using minpoly.aeval ℤ (μ ^ m)
 
 /-- `primitive_roots n K` is a subset of the roots of the minimal polynomial of a primitive
 `n`-th root of unity `μ`. -/
-lemma is_roots_of_minpoly : primitive_roots n K ⊆ (map (int.cast_ring_hom K)
+lemma is_roots_of_minpoly : primitive_roots n K ⊆ (map (algebra_map ℤ K)
   (minpoly ℤ μ)).roots.to_finset :=
 begin
   intros x hx,
@@ -952,7 +953,7 @@ end
 /-- The degree of the minimal polynomial of `μ` is at least `totient n`. -/
 lemma totient_le_degree_minpoly : nat.totient n ≤ (minpoly ℤ μ).nat_degree :=
 let P : polynomial ℤ := minpoly ℤ μ,-- minimal polynomial of `μ`
-    P_K : polynomial K := map (int.cast_ring_hom K) P -- minimal polynomial of `μ` sent to `K[X]`
+    P_K : polynomial K := map (algebra_map ℤ K) P -- minimal polynomial of `μ` sent to `K[X]`
 in calc
 n.totient = (primitive_roots n K).card : (h.card_primitive_roots hpos).symm
 ... ≤ P_K.roots.to_finset.card : finset.card_le_of_subset (is_roots_of_minpoly h hpos)

@@ -39,6 +39,8 @@ The `0`-th coefficient of `teichmuller_fun p r` is `r`, and all others are `0`.
 def teichmuller_fun (r : R) : 𝕎 R :=
 ⟨p, λ n, if n = 0 then r else 0⟩
 
+variables [algebra ℤ R] [algebra ℤ S]
+
 /-!
 ## `teichmuller` is a monoid homomorphism
 
