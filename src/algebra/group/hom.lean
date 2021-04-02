@@ -354,7 +354,6 @@ let ⟨y, hy⟩ := hx in ⟨f y, f.map_mul_eq_one hy⟩
 
 end monoid_hom
 
-set_option trace.simps.verbose true
 /-- The identity map from a type with 1 to itself. -/
 @[to_additive, simps]
 def one_hom.id (M : Type*) [has_one M] : one_hom M M :=
