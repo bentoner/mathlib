@@ -69,6 +69,8 @@ instance (n : ℕ) : comm_ring (fin (n+1)) :=
   ..fin.add_comm_group n,
   ..fin.comm_semigroup n }
 
+instance algebra_int (n : ℕ) : algebra ℤ (fin (n+1)) := algebra_int _
+
 end fin
 
 /-- The integers modulo `n : ℕ`. -/
@@ -100,6 +102,8 @@ instance has_repr : Π (n : ℕ), has_repr (zmod n)
 instance comm_ring : Π (n : ℕ), comm_ring (zmod n)
 | 0     := int.comm_ring
 | (n+1) := fin.comm_ring n
+
+instance algebra_int (n : ℕ) : algebra ℤ (zmod n) := algebra_int _
 
 instance inhabited (n : ℕ) : inhabited (zmod n) := ⟨0⟩
 
