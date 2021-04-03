@@ -140,7 +140,7 @@ Fiber bundle, topological bundle, vector bundle, local trivialization, structure
 variables {ι : Type*} {B : Type*} {F : Type*}
 
 open topological_space filter set
-open_locale topological_space
+open_locale topological_space classical
 
 /-! ### General definition of topological fiber bundles -/
 
@@ -325,6 +325,9 @@ lemma is_topological_fiber_bundle.comp_homeomorph {Z' : Type*} [topological_spac
 
 namespace bundle_trivialization
 
+/-- If `e` is a `bundle_trivialization` of `proj : Z → B` with fiber `F` and `h` is a homeomorphism
+`F ≃ₜ F'`, then `e.trans_fiber_homeomorph h` is the trivialization of `proj` with the fiber `F'`
+that sends `p : Z` to `((e p).1, h (e p).2)`. -/
 def trans_fiber_homeomorph {F' : Type*} [topological_space F']
   (e : bundle_trivialization F proj) (h : F ≃ₜ F') : bundle_trivialization F' proj :=
 { to_local_homeomorph := e.to_local_homeomorph.trans
@@ -340,8 +343,8 @@ def trans_fiber_homeomorph {F' : Type*} [topological_space F']
   e.trans_fiber_homeomorph h x = ((e x).1, h (e x).2) :=
 rfl
 
-def coord_change
-  (e₁ e₂ : bundle_trivialization F proj) (b : B) (x : F) : F :=
+/-- Coordinate transformation in the fiber induced by a pair of bundle trivializations. -/
+def coord_change (e₁ e₂ : bundle_trivialization F proj) (b : B) (x : F) : F :=
 (e₂ $ e₁.to_local_homeomorph.symm (b, x)).2
 
 lemma mk_coord_change
@@ -393,6 +396,8 @@ begin
     rwa [e₂.mem_source, e₁.proj_symm_apply' h₁] }
 end
 
+/-- Coordinate transformation in the fiber induced by a pair of bundle trivializations,
+as a homeomorphism. -/
 def coord_change_homeomorph
   (e₁ e₂ : bundle_trivialization F proj) {b : B} (h₁ : b ∈ e₁.base_set) (h₂ : b ∈ e₂.base_set) :
   F ≃ₜ F :=
@@ -478,6 +483,7 @@ lemma bundle_trivialization.is_image_preimage_prod (e : bundle_trivialization F 
   e.to_local_homeomorph.is_image (proj ⁻¹' s) (s.prod univ) :=
 λ x hx, by simp [e.coe_fst', hx]
 
+/-- Restrict a `bundle_trivialization` to an open set in the base. `-/
 def bundle_trivialization.restr_open (e : bundle_trivialization F proj) (s : set B)
   (hs : is_open s) :
   bundle_trivialization F proj :=
@@ -496,8 +502,12 @@ lemma bundle_trivialization.frontier_preimage (e : bundle_trivialization F proj)
 by rw [← (e.is_image_preimage_prod s).frontier.preimage_eq, frontier_prod_univ_eq,
   (e.is_image_preimage_prod _).preimage_eq, e.source_eq, preimage_inter]
 
-def bundle_trivialization.piecewise (e e' : bundle_trivialization F proj) (s : set B)
-  [Π x, decidable (x ∈ proj ⁻¹' s)] [Π (y : B × F), decidable (y ∈ s.prod (univ : set F))]
+/-- Given two bundle trivializations `e`, `e'` of `proj : Z → B` and a set `s : set B` such that
+the base sets of `e` and `e'` intersect `frontier s` on the same set and `e p = e' p` whenever
+`proj p ∈ e.base_set ∩ frontier s`, `e.piecewise e' s Hs Heq` is the bundle trivialization over
+`set.ite s e.base_set e'.base_set` that is equal to `e` on `proj ⁻¹ s` and is equal to `e'`
+otherwise. -/
+noncomputable def bundle_trivialization.piecewise (e e' : bundle_trivialization F proj) (s : set B)
   (Hs : e.base_set ∩ frontier s = e'.base_set ∩ frontier s)
   (Heq : eq_on e e' $ proj ⁻¹' (e.base_set ∩ frontier s)) :
   bundle_trivialization F proj :=
@@ -511,11 +521,13 @@ def bundle_trivialization.piecewise (e e' : bundle_trivialization F proj) (s : s
   target_eq := by simp [e.target_eq, e'.target_eq, prod_univ],
   proj_to_fun := by rintro p (⟨he, hs⟩|⟨he, hs⟩); simp * }
 
-def bundle_trivialization.piecewise_le_of_eq [linear_order B] [order_topology B]
-  (e e' : bundle_trivialization F proj) (a : B)
-  [Π x, decidable (x ∈ proj ⁻¹' (Iic a))]
-  [Π (y : B × F), decidable (y ∈ (Iic a).prod (univ : set F))]
-  (He : a ∈ e.base_set) (He' : a ∈ e'.base_set)
+/-- Given two bundle trivializations `e`, `e'` of a topological fiber bundle `proj : Z → B`
+over a linearly ordered base `B` and a point `a ∈ e.base_set ∩ e'.base_set` such that
+`e` equals `e'` on `proj ⁻¹' {a}`, `e.piecewise_le_of_eq e' a He He' Heq` is the bundle
+trivialization over `set.ite (Iic a) e.base_set e'.base_set` that is equal to `e` on points `p`
+such that `proj p ≤ a` and is equal to `e'` otherwise. -/
+noncomputable def bundle_trivialization.piecewise_le_of_eq [linear_order B] [order_topology B]
+  (e e' : bundle_trivialization F proj) (a : B) (He : a ∈ e.base_set) (He' : a ∈ e'.base_set)
   (Heq : ∀ p, proj p = a → e p = e' p) :
   bundle_trivialization F proj :=
 e.piecewise e' (Iic a)
@@ -523,11 +535,14 @@ e.piecewise e' (Iic a)
     by simp [He, He', mem_singleton_iff.1 (frontier_Iic_subset _ hx)])
   (λ p hp, Heq p $ frontier_Iic_subset _ hp.2)
 
-def bundle_trivialization.piecewise_le [linear_order B] [order_topology B]
-  (e e' : bundle_trivialization F proj) (a : B)
-  [Π x, decidable (x ∈ proj ⁻¹' (Iic a))]
-  [Π (y : B × F), decidable (y ∈ (Iic a).prod (univ : set F))]
-  (He : a ∈ e.base_set) (He' : a ∈ e'.base_set) :
+/-- Given two bundle trivializations `e`, `e'` of a topological fiber bundle `proj : Z → B` over a
+linearly ordered base `B` and a point `a ∈ e.base_set ∩ e'.base_set`, `e.piecewise_le e' a He He'`
+is the bundle trivialization over `set.ite (Iic a) e.base_set e'.base_set` that is equal to `e` on
+points `p` such that `proj p ≤ a` and is equal to `((e' p).1, h (e' p).2)` otherwise, where
+`h = `e'.coord_change_homeomorph e _ _` is the homeomorphism of the fiber such that
+`h (e' p).2 = (e p).2` whenever `e p = a`. -/
+noncomputable def bundle_trivialization.piecewise_le [linear_order B] [order_topology B]
+  (e e' : bundle_trivialization F proj) (a : B) (He : a ∈ e.base_set) (He' : a ∈ e'.base_set) :
   bundle_trivialization F proj :=
 e.piecewise_le_of_eq (e'.trans_fiber_homeomorph (e'.coord_change_homeomorph e He' He))
   a He He' $ by { unfreezingI {rintro p rfl },
@@ -535,9 +550,11 @@ e.piecewise_le_of_eq (e'.trans_fiber_homeomorph (e'.coord_change_homeomorph e He
     { simp [e.coe_fst', e'.coe_fst', *] },
     { simp [e'.coord_change_apply_snd, *] } }
 
-def bundle_trivialization.disjoint_union (e e' : bundle_trivialization F proj)
-  (H : disjoint e.base_set e'.base_set) [∀ x, decidable (x ∈ e.source)]
-  [∀ x, decidable (x ∈ e.target)] :
+/-- Given two bundle trivializations `e`, `e'` over disjoint sets, `e.disjoint_union e' H` is the
+bundle trivialization over the union of the base sets that agrees with `e` and `e'` over their
+base sets. -/
+noncomputable def bundle_trivialization.disjoint_union (e e' : bundle_trivialization F proj)
+  (H : disjoint e.base_set e'.base_set) :
   bundle_trivialization F proj :=
 { to_local_homeomorph := e.to_local_homeomorph.disjoint_union e'.to_local_homeomorph
     (λ x hx, by { rw [e.source_eq, e'.source_eq] at hx, exact H hx })
@@ -557,6 +574,8 @@ def bundle_trivialization.disjoint_union (e e' : bundle_trivialization F proj)
         exact λ h, H ⟨h, hp'⟩ }
     end }
 
+/-- If `h` is a topological fiber bundle over a conditionally complete linear order,
+then it is trivial over any closed interval. -/
 lemma is_topological_fiber_bundle.exists_trivialization_Icc_subset
   [conditionally_complete_linear_order B] [order_topology B]
   (h : is_topological_fiber_bundle F proj) (a b : B) :
@@ -942,3 +961,4 @@ begin
 end
 
 end topological_fiber_bundle_core
+#lint
