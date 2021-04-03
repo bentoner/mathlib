@@ -376,7 +376,7 @@ funext $ e.coord_change_same_apply h
 
 lemma coord_change_coord_change
   (e₁ e₂ e₃ : bundle_trivialization F proj) {b : B}
-  (h₁ : b ∈ e₁.base_set) (h₂ : b ∈ e₂.base_set) (h₃ : b ∈ e₃.base_set) (x : F) :
+  (h₁ : b ∈ e₁.base_set) (h₂ : b ∈ e₂.base_set) (x : F) :
   e₂.coord_change e₃ b (e₁.coord_change e₂ b x) = e₁.coord_change e₃ b x :=
 begin
   rw [bundle_trivialization.coord_change, e₁.mk_coord_change _ h₁ h₂, ← e₂.coe_coe,
@@ -961,4 +961,3 @@ begin
 end
 
 end topological_fiber_bundle_core
-#lint
