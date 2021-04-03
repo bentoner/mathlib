@@ -38,7 +38,7 @@ include hp
 
 namespace truncated_witt_vector
 
-variables (p) (n : ℕ) (R : Type*) [comm_ring R]
+variables (p) (n : ℕ) (R : Type*) [comm_ring R] [algebra ℤ R]
 
 lemma eq_of_le_of_cast_pow_eq_zero [char_p R p] (i : ℕ) (hin : i ≤ n)
   (hpi : (p ^ i : truncated_witt_vector p n R) = 0) :

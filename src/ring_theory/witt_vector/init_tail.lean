@@ -34,7 +34,7 @@ and shows how that polynomial interacts with `mv_polynomial.bind₁`.
 
 -/
 
-variables {p : ℕ} [hp : fact p.prime] (n : ℕ) {R : Type*} [comm_ring R]
+variables {p : ℕ} [hp : fact p.prime] (n : ℕ) {R : Type*} [comm_ring R] [algebra ℤ R]
 
 local notation `𝕎` := witt_vector p -- type as `\bbW`
 
@@ -98,10 +98,10 @@ begin
 end
 
 @[is_poly] lemma select_is_poly (P : ℕ → Prop) :
-  is_poly p (λ R _Rcr x, by exactI select P x) :=
+  is_poly p (λ R _Rcr _ x, by exactI select P x) :=
 begin
   use (select_poly P),
-  rintro R _Rcr x,
+  rintro R _Rcr _ x,
   funext i,
   apply coeff_select
 end
@@ -200,7 +200,7 @@ variables (p)
 omit hp
 
 /-- `witt_vector.init n x` is polynomial in the coefficients of `x`. -/
-lemma init_is_poly (n : ℕ) : is_poly p (λ R _Rcr, by exactI init n) :=
+lemma init_is_poly (n : ℕ) : is_poly p (λ R _Rcr _, by exactI init n) :=
 select_is_poly (λ i, i < n)
 
 end

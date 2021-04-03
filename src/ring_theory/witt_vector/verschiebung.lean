@@ -112,7 +112,7 @@ def verschiebung [algebra ℤ R] : 𝕎 R →+ 𝕎 R :=
 { to_fun := verschiebung_fun,
   map_zero' :=
   by ext ⟨⟩; rw [verschiebung_fun_coeff]; simp only [if_true, eq_self_iff_true, zero_coeff, if_t_t],
-  map_add' := by { ghost_calc _ _, rintro ⟨⟩; ghost_simp, sorry } }
+  map_add' := by { ghost_calc _ _, rintro ⟨⟩; ghost_simp } }
 
 /-- `witt_vector.verschiebung` is a polynomial function. -/
 @[is_poly] lemma verschiebung_is_poly :

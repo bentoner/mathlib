@@ -150,7 +150,7 @@ do ids ← ids'.mmap $ λ n, get_local n <|> tactic.intro n,
    end,
    iterate_exactly 2 apply_instance,
    unfreezingI (tactic.clear' tt [R]),
-   introsI $ [nm, nm<.>"_inst"] ++ ids',
+   introsI $ [nm, nm<.>"_inst", nm<.>"_inst_2"] ++ ids',
    skip
 
 end interactive
@@ -625,6 +625,7 @@ attribute [ghost_simps]
       alg_hom.map_sub alg_hom.map_neg alg_hom.id_apply alg_hom.map_nat_cast
       ring_hom.map_zero ring_hom.map_one ring_hom.map_mul ring_hom.map_add
       ring_hom.map_sub ring_hom.map_neg ring_hom.id_apply ring_hom.map_nat_cast
+      pi.zero_apply pi.zero_comp
       mul_add add_mul add_zero zero_add mul_one one_mul mul_zero zero_mul
       nat.succ_ne_zero nat.add_sub_cancel nat.succ_eq_add_one
       if_true eq_self_iff_true if_false forall_true_iff forall_2_true_iff forall_3_true_iff

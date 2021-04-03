@@ -90,7 +90,7 @@ lemma ext_iff {x y : truncated_witt_vector p n R} : x = y ↔ ∀ i, x.coeff i =
   mk p (λ i, x.coeff i) = x :=
 by { ext i, rw [coeff_mk] }
 
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 
 /--
 We can turn a truncated Witt vector `x` into a Witt vector
@@ -104,7 +104,7 @@ lemma coeff_out (x : truncated_witt_vector p n R) (i : fin n) :
   x.out.coeff i = x.coeff i :=
 by rw [out, witt_vector.coeff_mk, dif_pos i.is_lt, fin.eta]
 
-lemma out_injective : injective (@out p n R _) :=
+lemma out_injective : injective (@out p n R _ _) :=
 begin
   intros x y h,
   ext i,
@@ -134,7 +134,7 @@ variables {n}
   (truncate_fun n x).coeff i = x.coeff i :=
 by rw [truncate_fun, truncated_witt_vector.coeff_mk]
 
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 
 @[simp] lemma out_truncate_fun (x : 𝕎 R) :
   (truncate_fun n x).out = init n x :=
@@ -149,7 +149,7 @@ end witt_vector
 
 namespace truncated_witt_vector
 
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 
 @[simp] lemma truncate_fun_out (x : truncated_witt_vector p n R) :
   x.out.truncate_fun n = x :=
@@ -194,7 +194,7 @@ meta def tactic.interactive.witt_truncate_fun_tac : tactic unit :=
 namespace witt_vector
 
 variables (p n R)
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 
 lemma truncate_fun_surjective :
   surjective (@truncate_fun p n R) :=
@@ -229,7 +229,7 @@ end witt_vector
 namespace truncated_witt_vector
 open witt_vector
 variables (p n R)
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 include hp
 
 instance : comm_ring (truncated_witt_vector p n R) :=
@@ -246,7 +246,7 @@ namespace witt_vector
 open truncated_witt_vector
 
 variables (n)
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 include hp
 
 /-- `truncate n` is a ring homomorphism that truncates `x` to its first `n` entries
@@ -272,7 +272,7 @@ coeff_truncate_fun _ _
 variables (n)
 
 lemma mem_ker_truncate (x : 𝕎 R) :
-  x ∈ (@truncate p _ n R _).ker ↔ ∀ i < n, x.coeff i = 0 :=
+  x ∈ (@truncate p _ n R _ _).ker ↔ ∀ i < n, x.coeff i = 0 :=
 begin
   simp only [ring_hom.mem_ker, truncate, truncate_fun, ring_hom.coe_mk,
     truncated_witt_vector.ext_iff, truncated_witt_vector.coeff_mk, coeff_zero],
@@ -292,7 +292,7 @@ end witt_vector
 
 namespace truncated_witt_vector
 
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 include hp
 
 /--
@@ -310,7 +310,7 @@ ring_hom.lift_of_right_inverse (witt_vector.truncate m) out truncate_fun_out
   end⟩
 
 @[simp] lemma truncate_comp_witt_vector_truncate {m : ℕ} (hm : n ≤ m) :
-  (@truncate p _ n R _ m hm).comp (witt_vector.truncate m) = witt_vector.truncate n :=
+  (@truncate p _ n R _ _ m hm).comp (witt_vector.truncate m) = witt_vector.truncate n :=
 ring_hom.lift_of_right_inverse_comp _ _ _ _
 
 @[simp] lemma truncate_witt_vector_truncate {m : ℕ} (hm : n ≤ m) (x : 𝕎 R) :
@@ -326,12 +326,12 @@ begin
 end
 
 @[simp] lemma truncate_comp {n₁ n₂ n₃ : ℕ} (h1 : n₁ ≤ n₂) (h2 : n₂ ≤ n₃) :
-  (@truncate p _ _ R _ _ h1).comp (truncate h2) = truncate (h1.trans h2) :=
+  (@truncate p _ _ R _ _ _ h1).comp (truncate h2) = truncate (h1.trans h2) :=
 begin
   ext1 x, simp only [truncate_truncate, function.comp_app, ring_hom.coe_comp]
 end
 
-lemma truncate_surjective {m : ℕ} (hm : n ≤ m) : surjective (@truncate p _ _ R _ _ hm) :=
+lemma truncate_surjective {m : ℕ} (hm : n ≤ m) : surjective (@truncate p _ _ R _ _ _ hm) :=
 begin
   intro x,
   obtain ⟨x, rfl⟩ := witt_vector.truncate_surjective p _ R x,
@@ -358,7 +358,7 @@ by simp only [truncated_witt_vector, fintype.card_fin, fintype.card_fun]
 
 end fintype
 
-lemma infi_ker_truncate : (⨅ i : ℕ, (@witt_vector.truncate p _ i R _).ker) = ⊥ :=
+lemma infi_ker_truncate : (⨅ i : ℕ, (@witt_vector.truncate p _ i R _ _).ker) = ⊥ :=
 begin
   rw [submodule.eq_bot_iff],
   intros x hx,
@@ -374,7 +374,7 @@ open truncated_witt_vector (hiding truncate coeff)
 
 section lift
 
-variable [comm_ring R]
+variables [comm_ring R] [algebra ℤ R]
 variables {S : Type*} [semiring S]
 variable (f : Π k : ℕ, S →+* truncated_witt_vector p k R)
 variable f_compat : ∀ (k₁ k₂ : ℕ) (hk : k₁ ≤ k₂),

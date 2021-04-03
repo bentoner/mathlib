@@ -48,6 +48,7 @@ and bundle it into `witt_vector.frobenius`.
 namespace witt_vector
 
 variables {p : ℕ} {R S : Type*} [hp : fact p.prime] [comm_ring R] [comm_ring S]
+variables [algebra ℤ R] [algebra ℤ S]
 local notation `𝕎` := witt_vector p -- type as `\bbW`
 
 noncomputable theory
@@ -257,14 +258,14 @@ def frobenius : 𝕎 R →+* 𝕎 R :=
     refine is_poly.ext
       ((frobenius_fun_is_poly p).comp (witt_vector.zero_is_poly))
       ((witt_vector.zero_is_poly).comp (frobenius_fun_is_poly p)) _ _ 0,
-    ghost_simp
+    intros, ghost_simp
   end,
   map_one' :=
   begin
     refine is_poly.ext
       ((frobenius_fun_is_poly p).comp (witt_vector.one_is_poly))
       ((witt_vector.one_is_poly).comp (frobenius_fun_is_poly p)) _ _ 0,
-    ghost_simp
+    intros, ghost_simp
   end,
   map_add' := by ghost_calc _ _; ghost_simp,
   map_mul' := by ghost_calc _ _; ghost_simp }
@@ -280,7 +281,7 @@ ghost_component_frobenius_fun _ _
 variables (p)
 
 /-- `frobenius` is tautologically a polynomial function. -/
-@[is_poly] lemma frobenius_is_poly : is_poly p (λ R _Rcr, @frobenius p R _ _Rcr) :=
+@[is_poly] lemma frobenius_is_poly : is_poly p (λ R _Rcr _Ralg, @frobenius p R _ _Rcr _Ralg) :=
 frobenius_fun_is_poly _
 
 section char_p
@@ -304,7 +305,7 @@ begin
 end
 
 lemma frobenius_eq_map_frobenius :
-  @frobenius p R _ _ = map (_root_.frobenius R p) :=
+  @frobenius p R _ _ _ = map (_root_.frobenius R p) :=
 begin
   ext x n,
   simp only [coeff_frobenius_char_p, map_coeff, frobenius_def],
