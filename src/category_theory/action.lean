@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: David Wärn
 -/
 import category_theory.elements
+import category_theory.is_connected
 import category_theory.single_obj
 import group_theory.group_action.basic
 
@@ -93,6 +94,13 @@ variables {X} (x : X)
 def stabilizer_iso_End : stabilizer.submonoid M x ≃* End (↑x : action_category M X) :=
 mul_equiv.refl _
 
+/-- Any subgroup of `G` is a vertex group in its action groupoid. -/
+def End_mul_equiv_subgroup {G} [group G] (H : subgroup G) :
+  End (obj_equiv G (quotient_group.quotient H) (1 : G)) ≃* H :=
+mul_equiv.trans
+  (stabilizer_iso_End G ((1 : G) : quotient_group.quotient H)).symm
+  (mul_equiv.subgroup_congr $ stabilizer_quotient H)
+
 @[simp]
 lemma stabilizer_iso_End_apply (f : stabilizer.submonoid M x) :
   (stabilizer_iso_End M x).to_fun f = f := rfl
@@ -103,20 +111,35 @@ lemma stabilizer_iso_End_symm_apply (f : End _) :
 
 variables {M X}
 
-/-- A source `x` vertex and a scalar `m` determine a morphism in the action category. -/
-def hom_of_pair (s : X) (m : M) : (s : action_category M X) ⟶ (m • s : X) := ⟨m, rfl⟩
-
-@[simp] lemma hom_of_pair.val (x : X) (m : M) : (hom_of_pair x m).val = m := rfl
-
 @[simp] protected lemma id_val (x : action_category M X) : subtype.val (𝟙 x) = 1 := rfl
 
 @[simp] protected lemma comp_val {x y z : action_category M X}
   (f : x ⟶ y) (g : y ⟶ z) : (f ≫ g).val = g.val * f.val := rfl
 
-/-- Any morphism in the action category is the lift of some pair. -/
-protected def cases {P : Π ⦃a b : action_category M X⦄, (a ⟶ b) → Sort*}
+variables {G : Type*} [group G] [mul_action G X]
+
+/-- A target `x` vertex and a scalar `g` determine a morphism in the action groupoid. -/
+def hom_of_pair (t : X) (g : G) : ↑(g⁻¹ • t) ⟶ (t : action_category G X) :=
+subtype.mk g (smul_inv_smul g t)
+
+@[simp] lemma hom_of_pair.val (x : X) (g : G) : (hom_of_pair x g).val = g := rfl
+
+/-- Any morphism in the action groupoid is given by some pair. -/
+protected def cases {P : Π ⦃a b : action_category G X⦄, (a ⟶ b) → Sort*}
   (hyp : ∀ x m, P (hom_of_pair x m)) ⦃a b⦄ (f : a ⟶ b) : P f :=
-cast (by tidy) (hyp a.back f.val)
+begin
+  refine cast _ (hyp b.back f.val),
+  rcases a with ⟨⟨⟩, a : X⟩,
+  rcases b with ⟨⟨⟩, b : X⟩,
+  rcases f with ⟨g : G, h : g • a = b⟩,
+  cases (inv_smul_eq_iff.mpr h.symm),
+  refl
+end
+
+instance (G X) [monoid G] [mul_action G X] [is_pretransitive G X] [nonempty X] :
+  is_connected (action_category G X) :=
+zigzag_is_connected $ λ x y, relation.refl_trans_gen.single $ or.inl $
+  nonempty_subtype.mpr (show _, from exists_smul_eq G x.back y.back)
 
 end action_category
 end category_theory
