@@ -192,7 +192,7 @@ equiv.symm $ equiv.of_bijective
   ((orbit_equiv_quotient_stabilizer α b).symm a : β) = a • b :=
 rfl
 
-lemma stabilizer_quotient {G} [group G] (H : subgroup G) :
+@[simp] lemma stabilizer_quotient {G} [group G] (H : subgroup G) :
   mul_action.stabilizer G ((1 : G) : quotient H) = H :=
 by { ext, change _ = _ ↔ _, rw eq_comm, convert quotient_group.eq, simp }
 
