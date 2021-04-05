@@ -357,7 +357,7 @@ quotient.induction_on₂ s t $ λ l₁ l₂, quot.sound perm_append_comm
 protected theorem zero_add (s : multiset α) : 0 + s = s :=
 quot.induction_on s $ λ l, rfl
 
-theorem singleton_add (a : α) (s : multiset α) : ↑[a] + s = a ::ₘ s := rfl
+theorem singleton_add (a : α) (s : multiset α) : (a ::ₘ 0) + s = a ::ₘ s := rfl
 
 protected theorem add_le_add_left (s) {t u : multiset α} : s + t ≤ s + u ↔ t ≤ u :=
 quotient.induction_on₃ s t u $ λ l₁ l₂ l₃, subperm_append_left _
@@ -399,7 +399,7 @@ instance : canonically_ordered_add_monoid (multiset α) :=
   ..multiset.ordered_cancel_add_comm_monoid }
 
 @[simp] theorem cons_add (a : α) (s t : multiset α) : a ::ₘ s + t = a ::ₘ (s + t) :=
-by rw [← singleton_add, ← singleton_add, add_assoc]
+by rw [← singleton_add a s, ← singleton_add a (s + t), add_assoc]
 
 @[simp] theorem add_cons (a : α) (s t : multiset α) : s + a ::ₘ t = a ::ₘ (s + t) :=
 by rw [add_comm, cons_add, add_comm]
