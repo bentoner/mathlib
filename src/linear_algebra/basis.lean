@@ -268,6 +268,14 @@ linear_independent_iff.mpr $ λ l hl,
 calc l = b.repr (finsupp.total _ _ _ b l) : (b.repr_total l).symm
    ... = 0 : by rw [hl, linear_equiv.map_zero]
 
+protected lemma mem_span (x : M) : x ∈ span R (range b) :=
+by { rw [← b.total_repr x, finsupp.total_apply, finsupp.sum],
+    exact submodule.sum_mem _ (λ i hi, submodule.smul_mem _ _ (submodule.subset_span ⟨i, rfl⟩)) }
+
+
+protected lemma span_eq : span R (range b) = ⊤ :=
+eq_top_iff.mpr $ λ x _, b.mem_span x
+
 section constr
 
 variables (S : Type*) [semiring S] [semimodule S M']
@@ -465,6 +473,8 @@ end singleton
 
 section empty
 
+variables (M)
+
 /-- If `M` is a subsingleton and `ι` is empty, this is the unique `ι`-indexed basis for `M`. -/
 protected def empty [subsingleton M] (h_empty : ¬ nonempty ι) : basis ι R M :=
 of_repr
@@ -476,7 +486,7 @@ of_repr
     map_smul' := λ c x, by simp }
 
 lemma empty_unique [subsingleton M] (h_empty : ¬ nonempty ι)
-  (b : basis ι R M) : b = basis.empty h_empty :=
+  (b : basis ι R M) : b = basis.empty M h_empty :=
 by { ext i, cases h_empty ⟨i⟩ }
 
 end empty
@@ -701,13 +711,24 @@ noncomputable def of_vector_space_index : set V :=
 noncomputable def of_vector_space : basis (of_vector_space_index K V) K V :=
 basis.extend (linear_independent_empty K V)
 
-@[simp] lemma of_vector_space_apply_self (x : of_vector_space_index K V) :
+lemma of_vector_space_apply_self (x : of_vector_space_index K V) :
   of_vector_space K V x = x :=
 basis.mk_apply _ _ _
+
+@[simp] lemma coe_of_vector_space :
+  ⇑(of_vector_space K V) = coe :=
+funext (λ x, of_vector_space_apply_self K V x)
+
+lemma of_vector_space_index.linear_independent :
+  linear_independent K (coe : of_vector_space_index K V → V) :=
+by { convert (of_vector_space K V).linear_independent, ext x, rw of_vector_space_apply_self }
 
 @[simp] lemma range_of_vector_space :
   range (of_vector_space K V) = of_vector_space_index K V :=
 range_extend _
+
+lemma exists_basis : ∃ s : set V, nonempty (basis s K V) :=
+⟨of_vector_space_index K V, ⟨of_vector_space K V⟩⟩
 
 end
 
