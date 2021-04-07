@@ -36,7 +36,7 @@ vector space and `ι : Type*` is an arbitrary indexing type.
 
 * `basis.ext` states that two linear maps are equal if they coincide on a basis.
 
-* `nonempty_basis` states that every vector space has a basis.
+* `basis.of_vector_space` states that every vector space has a basis.
 
 ## Implementation notes
 
@@ -367,7 +367,7 @@ variables (b' : basis ι' R M')
 /-- `basis.prod` maps a `ι`-indexed basis for `M` and a `ι'`-indexed basis for `M'`
 to a `ι ⊕ ι'`-index basis for `M × M'`. -/
 protected def prod : basis (ι ⊕ ι') R (M × M') :=
-of_repr ((b.repr.prod b'.repr).trans (finsupp.sum_arrow_lequiv_prod_arrow R).symm)
+of_repr ((b.repr.prod b'.repr).trans (finsupp.sum_finsupp_lequiv_prod_finsupp R).symm)
 
 @[simp]
 lemma prod_repr_inl (x) (i) : (b.prod b').repr x (sum.inl i) = b.repr x.1 i := rfl
@@ -381,7 +381,7 @@ b.repr.injective $ by
 { ext j,
   simp only [basis.prod, basis.coe_of_repr, linear_equiv.symm_trans_apply, linear_equiv.prod_symm,
       linear_equiv.prod_apply, b.repr.apply_symm_apply, linear_equiv.symm_symm, repr_self,
-      equiv.to_fun_as_coe, finsupp.fst_sum_arrow_lequiv_prod_arrow],
+      equiv.to_fun_as_coe, finsupp.fst_sum_finsupp_lequiv_prod_finsupp],
   apply finsupp.single_apply_left sum.inl_injective }
 
 lemma prod_apply_inr_fst (i) :
@@ -390,7 +390,7 @@ b.repr.injective $ by
 { ext i,
   simp only [basis.prod, basis.coe_of_repr, linear_equiv.symm_trans_apply, linear_equiv.prod_symm,
       linear_equiv.prod_apply, b.repr.apply_symm_apply, linear_equiv.symm_symm, repr_self,
-      equiv.to_fun_as_coe, finsupp.fst_sum_arrow_lequiv_prod_arrow, linear_equiv.map_zero,
+      equiv.to_fun_as_coe, finsupp.fst_sum_finsupp_lequiv_prod_finsupp, linear_equiv.map_zero,
       finsupp.zero_apply],
   apply finsupp.single_eq_of_ne sum.inr_ne_inl }
 
@@ -400,7 +400,7 @@ b'.repr.injective $ by
 { ext j,
   simp only [basis.prod, basis.coe_of_repr, linear_equiv.symm_trans_apply, linear_equiv.prod_symm,
       linear_equiv.prod_apply, b'.repr.apply_symm_apply, linear_equiv.symm_symm, repr_self,
-      equiv.to_fun_as_coe, finsupp.snd_sum_arrow_lequiv_prod_arrow, linear_equiv.map_zero,
+      equiv.to_fun_as_coe, finsupp.snd_sum_finsupp_lequiv_prod_finsupp, linear_equiv.map_zero,
       finsupp.zero_apply],
   apply finsupp.single_eq_of_ne sum.inl_ne_inr }
 
@@ -410,7 +410,7 @@ b'.repr.injective $ by
 { ext i,
   simp only [basis.prod, basis.coe_of_repr, linear_equiv.symm_trans_apply, linear_equiv.prod_symm,
       linear_equiv.prod_apply, b'.repr.apply_symm_apply, linear_equiv.symm_symm, repr_self,
-      equiv.to_fun_as_coe, finsupp.snd_sum_arrow_lequiv_prod_arrow],
+      equiv.to_fun_as_coe, finsupp.snd_sum_finsupp_lequiv_prod_finsupp],
   apply finsupp.single_apply_left sum.inr_injective }
 
 @[simp]
@@ -456,6 +456,10 @@ of_repr
 @[simp] lemma singleton_apply (ι R : Type*) [unique ι] [semiring R] (i) :
   basis.singleton ι R i = 1 :=
 apply_eq_iff.mpr (by simp [basis.singleton])
+
+@[simp] lemma singleton_repr (ι R : Type*) [unique ι] [semiring R] (x i) :
+  (basis.singleton ι R).repr x i = x :=
+by simp [basis.singleton, unique.eq_default i]
 
 end singleton
 
