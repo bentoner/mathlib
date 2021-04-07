@@ -10,7 +10,7 @@ groups with this property. For an explicit construction of free groups, see
 `group_theory/free_group`.
 -/
 noncomputable theory
-universe u
+universes u w
 
 /-- `is_free_group G` means that `G` has the universal property of a free group.
     That is, it has a family `generators G` of elements, such that a group homomorphism
@@ -78,7 +78,9 @@ def of_mul_equiv (h : G ≃* H) : is_free_group H :=
     apply hF',
   end }
 
-lemma unique_lift' {X} [group X] (f : generators G → X) : ∃! F : G →* X, ∀ a, F (of a) = f a :=
+/-- A universe-polymorphic version of `unique_lift`. -/
+lemma unique_lift' {X} [group.{w} X] (f : generators G → X) :
+  ∃! F : G →* X, ∀ a, F (of a) = f a :=
 ⟨(free_group.lift f).comp (iso_free_group_of_is_free_group G).to_monoid_hom, by simp,
   begin
     intros F' hF',

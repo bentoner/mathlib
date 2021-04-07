@@ -167,9 +167,8 @@ have F_map_eq : ∀ {a b} {f : a ⟶ b}, F.map f = (F.map (hom_of_pair b.back f.
   map_id' := by { intro x, rw [action_category.id_val, F.map_one], refl },
   map_comp' := begin
     intros x y z f g, revert y z g,
-    refine action_category.cases _, intros,
-    rw [action_category.comp_val, F.map_mul, mul_left, pi.mul_apply, mul_aut_arrow_apply, sane,
-      hom_of_pair.val, single_obj.comp_as_mul, coe_back, coe_back],
+    refine action_category.cases _,
+    simp [single_obj.comp_as_mul, sane],
   end }
 
 end group

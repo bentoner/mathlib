@@ -139,7 +139,7 @@ local attribute [instance] arrow_action
 
 /-- Given groups `G H` with `G` acting on `A`, `G` acts by
   multiplicative automorphisms on `A → H`. -/
-def mul_aut_arrow {G A H} [group G] [mul_action G A] [group H] : G →* mul_aut (A → H) :=
+@[simps] def mul_aut_arrow {G A H} [group G] [mul_action G A] [group H] : G →* mul_aut (A → H) :=
 { to_fun := λ g,
   { to_fun := λ F, g • F,
     inv_fun := λ F, g⁻¹ • F,
@@ -148,8 +148,5 @@ def mul_aut_arrow {G A H} [group G] [mul_action G A] [group H] : G →* mul_aut 
     map_mul' := by { intros, funext, simp only [arrow_action_to_has_scalar_smul, pi.mul_apply] } },
   map_one' := by { ext, simp only [mul_aut.one_apply, mul_equiv.coe_mk, one_smul] },
   map_mul' := by { intros, ext, simp only [mul_smul, mul_equiv.coe_mk, mul_aut.mul_apply] } }
-
-@[simp] lemma mul_aut_arrow_apply {G A H : Type*} [group G] [mul_action G A] [group H]
-  (g : G) (F : A → H) (a : A) : mul_aut_arrow g F a = F (g⁻¹ • a) := rfl
 
 end arrow
